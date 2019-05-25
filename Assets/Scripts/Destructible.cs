@@ -6,12 +6,17 @@ public class Destructible : MonoBehaviour
 {
     public GameObject destroyEffect;
 
-    private void OnMouseDown()
+    public void OnMouseDown()
+    {
+        Explode(1f);
+    }
+
+    public void Explode(float time)
     {
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         // change color to red
         meshRenderer.material.color = Color.blue;
-        StartCoroutine(Destroy(1f));
+        StartCoroutine(Destroy(time));
     }
 
     private IEnumerator Destroy(float time)
