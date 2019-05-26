@@ -17,7 +17,7 @@ public class MenuController : MonoBehaviour
             {
                 resume();
             }
-            else
+            else if(GameController.INSTANCE.currentState == GameController.GameState.STARTED)
             {
                 pause();
             }
@@ -36,19 +36,5 @@ public class MenuController : MonoBehaviour
         pauseMenu.SetActive(false);
         Time.timeScale = 1f;
         GameController.INSTANCE.currentState = GameController.GameState.STARTED;
-    }
-
-    public void start()
-    {
-        SceneManager.LoadScene("GameScene");
-    }
-
-    public void mainMenu()
-    {
-
-    }
-    public void quit()
-    {
-        Application.Quit();
     }
 }

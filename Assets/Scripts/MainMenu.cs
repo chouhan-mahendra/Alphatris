@@ -34,12 +34,12 @@ public class MainMenu : MonoBehaviour
         Debug.Log("Loading Game");
         gameObject.SetActive(false);
         inGameMenu.SetActive(true);
-        gameController.startGame();
+        //gameController.startGame();
     }
 
     public void toggleMusic() {
         Debug.Log("Toggle Music");
-        gameController.toggleMusic();
+        //gameController.toggleMusic();
     }
 
     public void endGame(int time) {
