@@ -8,12 +8,14 @@ public class GameController : MonoBehaviour
 {
     public static GameController INSTANCE;
     public enum GameState { STARTED, PAUSED, IN_LOBBY }
-
     public GameState currentState;
+
     public GameObject alphabetPrefab;
     public List<GameObject> alphabets;
+
     public int ROWS = 4;
     public float WIDTH = 10;
+    public int SCORE = 0;
     private float SCALE = 1;
 
     private void Awake()
@@ -24,6 +26,11 @@ public class GameController : MonoBehaviour
             Destroy(gameObject);
         Time.timeScale = 1.5f;
         currentState = GameState.IN_LOBBY;
+    }
+
+    public static int GetScore()
+    {
+        return INSTANCE.SCORE;
     }
 
     public void StartGame()
@@ -39,6 +46,11 @@ public class GameController : MonoBehaviour
             alphabets[i].GetComponent<Destructible>().Explode(i*0.1f);
         }
         alphabets = new List<GameObject>();
+    }
+
+    public static void SetState(GameState nextState)
+    {
+        INSTANCE.currentState = nextState;
     }
 
     public void EndGame()
@@ -65,4 +77,8 @@ public class GameController : MonoBehaviour
         Application.Quit();
     }
 
+    public static GameState GetState()
+    {
+        return INSTANCE.currentState;
+    }
 }
