@@ -70,6 +70,8 @@ public class GameController : MonoBehaviour
         GameObject go = Instantiate(alphabetPrefab, position, Quaternion.identity);
         go.transform.localScale = Vector3.one * SCALE;
         alphabets.Add(go);
+        Alphabet alpha = go.GetComponent<Alphabet>();
+        alpha.alpha = (char)(Random.Range(0,26) + 65);
     }
 
     public void Quit()
