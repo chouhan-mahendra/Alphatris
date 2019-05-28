@@ -9,13 +9,13 @@ public class GameController : MonoBehaviour
     public static GameController INSTANCE;
     public enum GameState { STARTED, PAUSED, IN_LOBBY }
     public GameState currentState;
-
     public GameObject alphabetPrefab;
     public List<GameObject> alphabets;
-
     public int ROWS = 4;
     public float WIDTH = 10;
     public int SCORE = 0;
+    public MenuController menuController;
+
     private float SCALE = 1;
 
     private void Awake()
@@ -39,7 +39,7 @@ public class GameController : MonoBehaviour
         Time.timeScale = 1f;
         SCALE = WIDTH / ROWS;
         //Keep instantiating new aplhabets
-        InvokeRepeating("createAlphabet", 2.0f, 1f);
+        InvokeRepeating("CreateAlphabet", 2.0f, 1f);
         //Fancy animation on start game :)
         for(int i = 0;i < alphabets.Count; ++i) 
         {
@@ -63,15 +63,15 @@ public class GameController : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    void createAlphabet()
+    void CreateAlphabet()
     {
-        float x = Random.Range(0, ROWS) * SCALE;
+        int x = (int) (Random.Range(0, ROWS) * SCALE);
         Vector3 position = new Vector3(x , 5, 0);
-        GameObject go = Instantiate(alphabetPrefab, position, Quaternion.identity);
-        go.transform.localScale = Vector3.one * SCALE;
-        alphabets.Add(go);
-        Alphabet alpha = go.GetComponent<Alphabet>();
-        alpha.alpha = (char)(Random.Range(0,26) + 65);
+        GameObject alphabetGO = Instantiate(alphabetPrefab, position, Quaternion.identity);
+        alphabetGO.transform.localScale = Vector3.one * SCALE;
+        alphabetGO.GetComponent<Alphabet>().character = (char)(Random.Range(0,26) + 65);
+        alphabetGO.GetComponent<Alphabet>().clickListener = menuController;
+        alphabets.Add(alphabetGO);
     }
 
     public void Quit()

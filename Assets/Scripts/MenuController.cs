@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class MenuController : MonoBehaviour
+public class MenuController : MonoBehaviour ,IClickable
 {
     public GameObject pauseMenu;
     public GameObject startMenu;
     public GameObject settingsMenu;
-    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI score;
+    public TextMeshProUGUI selection;
+
     // Update is called once per frame
     void Update()
     {
@@ -16,7 +18,7 @@ public class MenuController : MonoBehaviour
 
         switch(state) {
             case GameController.GameState.STARTED:
-                scoreText.SetText("SCORE " + GameController.GetScore().ToString());
+                score.SetText("SCORE " + GameController.GetScore().ToString());
                 break;
         }
 
@@ -55,5 +57,12 @@ public class MenuController : MonoBehaviour
         //        time.ToString() + " seconds");
         //finalScoreMenu.SetActive(true);
         //inGameMenu.SetActive(false);
+    }
+
+    public void OnClick(Alphabet alphabet)
+    {
+        if(alphabet.GetIsSelected()) {
+            selection.SetText(selection.text + alphabet.character);
+        }
     }
 }

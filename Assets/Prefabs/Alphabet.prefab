@@ -142,7 +142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b77608b95dad40b489c9e22bb35d5de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alpha: 88
+  character: 65
   onSelectColor: {r: 0.46226418, g: 0.4600837, b: 0.4600837, a: 1}
 --- !u!1 &667510701
 GameObject:
