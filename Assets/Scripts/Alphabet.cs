@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Alphabet : MonoBehaviour
 {
-    public string alpha;
+    public char alpha;
     public Color onSelectColor;
     private Color naturalColor;
     private bool isSelected;
@@ -26,7 +26,7 @@ public class Alphabet : MonoBehaviour
             Debug.Log(child.gameObject.name);
             TextMeshPro text = child.gameObject.GetComponent<TextMeshPro>();
             if (text != null)
-                text.SetText(alpha);
+                text.SetText(alpha.ToString());
             else Debug.Log("TextMeshPro not found");
         }
     }
