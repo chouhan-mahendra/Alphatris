@@ -74,6 +74,11 @@ public class GameController : MonoBehaviour
         alphabets.Add(alphabetGO);
     }
 
+    internal void UpdateScore(int length)
+    {
+        SCORE += length;
+    }
+
     public void Quit()
     {
         Application.Quit();

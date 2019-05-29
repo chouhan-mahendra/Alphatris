@@ -42,5 +42,10 @@ public class Alphabet : MonoBehaviour
         meshRenderer.material.color = isSelected ? onSelectColor : naturalColor;
     }
 
+    public void Explode()
+    {
+        GetComponent<Destructible>().Explode(0.1f);
+    }
+
     public bool GetIsSelected() { return isSelected; }
 }

@@ -10,6 +10,7 @@ public class MenuController : MonoBehaviour ,IClickable
     public GameObject settingsMenu;
     public TextMeshProUGUI score;
     public TextMeshProUGUI selection;
+    private List<Alphabet> selectedItems = new List<Alphabet>();
 
     // Update is called once per frame
     void Update()
@@ -63,6 +64,16 @@ public class MenuController : MonoBehaviour ,IClickable
     {
         if(alphabet.GetIsSelected()) {
             selection.SetText(selection.text + alphabet.character);
+            selectedItems.Add(alphabet);
         }
+    }
+
+    public void OnUpdateScoreClicked()
+    {
+        GameController.INSTANCE
+            .UpdateScore(selection.text.Length);
+        selection.SetText("");
+        foreach (Alphabet alphabet in selectedItems) alphabet.Explode();
+        selectedItems.Clear();
     }
 }
