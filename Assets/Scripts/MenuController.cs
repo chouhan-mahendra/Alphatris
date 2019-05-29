@@ -73,7 +73,8 @@ public class MenuController : MonoBehaviour ,IClickable
         GameController.INSTANCE
             .UpdateScore(selection.text.Length);
         selection.SetText("");
-        foreach (Alphabet alphabet in selectedItems) alphabet.Explode();
+        for(int i = 0;  i < selectedItems.Count; ++i) 
+            selectedItems[i].Explode(i * 0.05f);
         selectedItems.Clear();
     }
 }

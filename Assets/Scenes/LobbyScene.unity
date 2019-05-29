@@ -2447,7 +2447,7 @@ MonoBehaviour:
   - {fileID: 1200602469}
   - {fileID: 2115669649}
   - {fileID: 1553178733}
-  ROWS: 10
+  ROWS: 5
   WIDTH: 10
   SCORE: 15
   menuController: {fileID: 904995225}

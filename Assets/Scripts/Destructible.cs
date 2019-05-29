@@ -15,13 +15,13 @@ public class Destructible : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         GameObject destroyEffectInst = Instantiate(destroyEffect, transform.position, Quaternion.identity);
-        Collider[] colliders = Physics.OverlapSphere(transform.position, 2);
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 1);
         foreach (Collider nearby in colliders)
         {
             Rigidbody rb = nearby.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.AddExplosionForce(500, transform.position, 4);
+                rb.AddExplosionForce(200, transform.position, 4);
             }
         }
         Destroy(this.gameObject);
