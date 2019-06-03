@@ -40,7 +40,7 @@ public class MenuController : MonoBehaviour ,IClickable
     {
         pauseMenu.SetActive(true);
         GameController.SetState(GameController.GameState.PAUSED);
-        Time.timeScale = 0.05f;
+        Time.timeScale = 0.1f;
     }
 
     public void resume()

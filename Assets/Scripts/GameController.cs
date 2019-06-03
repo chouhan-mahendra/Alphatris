@@ -8,13 +8,18 @@ public class GameController : MonoBehaviour
 {
     public static GameController INSTANCE;
     public enum GameState { STARTED, PAUSED, IN_LOBBY }
+    public enum Mode { LOCAL, MULTIPLAYER }
+
     public GameState currentState;
+    public Mode currentGameMode;
+
     public GameObject alphabetPrefab;
     public List<GameObject> alphabets;
     public int ROWS = 4;
     public float WIDTH = 10;
     public int SCORE = 0;
     public MenuController menuController;
+    public NetworkController networkController;
 
     private float SCALE = 1;
 
@@ -33,13 +38,23 @@ public class GameController : MonoBehaviour
         return INSTANCE.SCORE;
     }
 
-    public void StartGame()
+    public void StartGame(int mode)
     {
+        currentGameMode = (Mode)mode;
+
         currentState = GameState.STARTED;
         Time.timeScale = 1f;
         SCALE = WIDTH / ROWS;
-        //Keep instantiating new aplhabets
-        InvokeRepeating("CreateAlphabet", 2.0f, 1f);
+        switch (currentGameMode) {
+            case Mode.LOCAL: 
+                //Keep instantiating new aplhabets
+                InvokeRepeating("CreateAlphabet", 2.0f, 1f);
+                break;
+            case Mode.MULTIPLAYER:
+                networkController.EnableNetwork();
+                break;
+        }
+
         //Fancy animation on start game :)
         for(int i = 0;i < alphabets.Count; ++i) 
         {
@@ -67,9 +82,14 @@ public class GameController : MonoBehaviour
     {
         int x = (int) (Random.Range(0, ROWS) * SCALE);
         Vector3 position = new Vector3(x , 5, 0);
+        char character = (char)(Random.Range(0, 26) + 65);
+        CreateAlphabet(position, character);
+    }
+
+    void CreateAlphabet(Vector3 position, char character) {
         GameObject alphabetGO = Instantiate(alphabetPrefab, position, Quaternion.identity);
         alphabetGO.transform.localScale = Vector3.one * SCALE;
-        alphabetGO.GetComponent<Alphabet>().character = (char)(Random.Range(0,26) + 65);
+        alphabetGO.GetComponent<Alphabet>().character = character;
         alphabetGO.GetComponent<Alphabet>().clickListener = menuController;
         alphabets.Add(alphabetGO);
     }

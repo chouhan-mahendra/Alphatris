@@ -7,6 +7,9 @@ using UnityEngine;
 public class NetworkController : MonoBehaviour
 {
     private SocketIOComponent socket;
+    private string playerName;
+    private string id;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,28 +21,43 @@ public class NetworkController : MonoBehaviour
         socket.On("playerDisconnected", OnPlayerDisconnected);
     }
 
-    private void OnPlayerDisconnected(SocketIOEvent obj)
+    public void EnableNetwork()
     {
-        throw new NotImplementedException();
+        socket.enabled = true;
     }
 
-    private void OnPlayerConnected(SocketIOEvent obj)
+    public void DisableNetwork()
     {
-        throw new NotImplementedException();
+        socket.enabled = false;
+    }
+
+    private void OnPlayerDisconnected(SocketIOEvent e)
+    {
+        Debug.Log("Player disconnected {" + e.data["id"] + ","+ e.data["name"] + "}");
+    }
+
+    private void OnPlayerConnected(SocketIOEvent e)
+    {
+        string id = e.data["id"].ToString();
+        string name = e.data["name"].ToString();
+        Debug.Log("Player connected {"+ id +"," + name + "}");
     }
 
     private void OnStartGame(SocketIOEvent obj)
     {
-        throw new NotImplementedException();
+        Debug.Log("Starting new game");
     }
 
-    private void OnInit(SocketIOEvent obj)
+    private void OnInit(SocketIOEvent e)
     {
-
+        id = e.data["id"].ToString();
+        playerName = e.data["name"].ToString();
+        Debug.Log("Init {" + id + "," + playerName + "}");
     }
 
     private void OnConnected(SocketIOEvent obj)
     {
         Debug.Log("connected to server");
     }
+
 }

@@ -26,9 +26,12 @@ socketIo.on("connection", socket => {
     socket.broadcast.emit(GameActions.playerConnected, { id : data.id, name : data.name });
     //for current player
     socket.emit(GameActions.init, { id : data.id, name : data.name });
+    //simulate player connections for current player
     Object.keys(state).forEach(item => socket.emit(GameActions.playerConnected, { id : item.id, name : item.name }));
     state[data.id] = data;
 
+    if(Object.keys(state).length > 1) 
+        socketIo.local.emit(GameActions.startGame,{});
     // socket.on(GameActions.move, (data) => {
     //     console.log("move :" + JSON.stringify(data));
     //     state[data.id] = data;
@@ -39,6 +42,6 @@ socketIo.on("connection", socket => {
     socket.on("disconnect", () => {
         console.log(`client ${data.id} disconnected!!`);
         delete state[data.id];
-        socket.broadcast.emit(GameActions.playerDisconnected, { id : data.id });
+        socket.broadcast.emit(GameActions.playerDisconnected, { id : data.id, name : data.name });
     });
 });
