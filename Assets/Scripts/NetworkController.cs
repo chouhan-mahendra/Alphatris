@@ -19,6 +19,7 @@ public class NetworkController : MonoBehaviour
         socket.On("startGame", OnStartGame);
         socket.On("playerConnected", OnPlayerConnected);
         socket.On("playerDisconnected", OnPlayerDisconnected);
+        socket.On("initAlphabet", OnInitAlphabet);
     }
 
     //TODO : write reconnection logic
@@ -52,6 +53,14 @@ public class NetworkController : MonoBehaviour
         string ch = (e.data["char"].ToString());
         Debug.Log("Players are online, Starting new game from " + position + "," + ch[1]);
         GameController.INSTANCE.StartGame(1);
+        GameController.INSTANCE.CreateAlphabet(position, ch[1]);
+    }
+
+    private void OnInitAlphabet(SocketIOEvent e) {
+        Debug.Log(e.data["x"].ToString() + e.data["char"].ToString()); 
+        int x = int.Parse(e.data["x"].ToString());
+        Vector3 position = new Vector3(x, 5, 0);
+        string ch = (e.data["char"].ToString());
         GameController.INSTANCE.CreateAlphabet(position, ch[1]);
     }
 

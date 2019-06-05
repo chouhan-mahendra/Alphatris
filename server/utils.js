@@ -27,4 +27,9 @@ function randomID() {
 	return Math.random().toString(36).substring(4);
 }
 
-module.exports = { getRandomName : haiku, getRandomID : randomID };
+function randomChar() {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  return characters[Math.floor(Math.random() * characters.length)];
+}
+
+module.exports = { getRandomName : haiku, getRandomID : randomID , getRandomChar : randomChar };
