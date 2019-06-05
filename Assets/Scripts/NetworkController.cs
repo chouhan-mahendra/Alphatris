@@ -21,7 +21,8 @@ public class NetworkController : MonoBehaviour
         socket.On("playerDisconnected", OnPlayerDisconnected);
     }
 
-    public void EnableNetwork()
+    //TODO : write reconnection logic
+    public void RequestConnection()
     {
         socket.enabled = true;
     }
@@ -43,9 +44,15 @@ public class NetworkController : MonoBehaviour
         Debug.Log("Player connected {"+ id +"," + name + "}");
     }
 
-    private void OnStartGame(SocketIOEvent obj)
+    private void OnStartGame(SocketIOEvent e)
     {
-        Debug.Log("Starting new game");
+        Debug.Log(e.data["x"].ToString() + e.data["char"].ToString()); 
+        int x = int.Parse(e.data["x"].ToString());
+        Vector3 position = new Vector3(x, 5, 0);
+        string ch = (e.data["char"].ToString());
+        Debug.Log("Players are online, Starting new game from " + position + "," + ch[1]);
+        GameController.INSTANCE.StartGame(1);
+        GameController.INSTANCE.CreateAlphabet(position, ch[1]);
     }
 
     private void OnInit(SocketIOEvent e)

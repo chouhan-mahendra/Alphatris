@@ -38,10 +38,13 @@ public class GameController : MonoBehaviour
         return INSTANCE.SCORE;
     }
 
+    public void RequestConnection() {
+        networkController.RequestConnection();
+    }
+
     public void StartGame(int mode)
     {
         currentGameMode = (Mode)mode;
-
         currentState = GameState.STARTED;
         Time.timeScale = 1f;
         SCALE = WIDTH / ROWS;
@@ -51,7 +54,7 @@ public class GameController : MonoBehaviour
                 InvokeRepeating("CreateAlphabet", 2.0f, 1f);
                 break;
             case Mode.MULTIPLAYER:
-                networkController.EnableNetwork();
+                menuController.DisableWaitingForPlayersMenu();
                 break;
         }
 
@@ -73,10 +76,6 @@ public class GameController : MonoBehaviour
         SceneManager.LoadScene("LobbyScene");
     }
 
-    internal void toggleMusic()
-    {
-        throw new NotImplementedException();
-    }
 
     void CreateAlphabet()
     {
@@ -86,7 +85,7 @@ public class GameController : MonoBehaviour
         CreateAlphabet(position, character);
     }
 
-    void CreateAlphabet(Vector3 position, char character) {
+    public void CreateAlphabet(Vector3 position, char character) {
         GameObject alphabetGO = Instantiate(alphabetPrefab, position, Quaternion.identity);
         alphabetGO.transform.localScale = Vector3.one * SCALE;
         alphabetGO.GetComponent<Alphabet>().character = character;
