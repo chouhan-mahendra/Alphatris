@@ -18,7 +18,7 @@ socketIo.on("connection", socket => {
     const data = { 
                     id : utils.getRandomID(), 
                     name : utils.getRandomName(),
-                    channel : socket 
+                    socket 
                 };
 
     console.log(`client connected [${data.id} , ${data.name}]`);
@@ -30,14 +30,15 @@ socketIo.on("connection", socket => {
     Object.keys(state).forEach(item => socket.emit(GameActions.playerConnected, { id : item.id, name : item.name }));
     state[data.id] = data;
 
-    if(Object.keys(state).length > 1) 
-        socketIo.local.emit(GameActions.startGame,{});
-    // socket.on(GameActions.move, (data) => {
-    //     console.log("move :" + JSON.stringify(data));
-    //     state[data.id] = data;
-    //     socket.broadcast.emit(GameActions.move, data);
-    //     socket.emit(GameActions.move, data);
-    // });
+    if(Object.keys(state).length >= 1) {
+        const event = { x : 2, char : 'Z' };
+        console.log(`all players are ready, starting game with ${JSON.stringify(event)}`)
+        // socketIo.local.emit(GameActions.startGame, event);
+        Object.keys(state).forEach(player => {
+            console.log(`starting game for ${player}, ${state[player].name}`);
+            state[player].socket.emit(GameActions.startGame, event);
+        });
+    }
 
     socket.on("disconnect", () => {
         console.log(`client ${data.id} disconnected!!`);
