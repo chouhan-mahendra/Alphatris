@@ -28,7 +28,7 @@ function randomID() {
 }
 
 function randomChar() {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const characters = "AAAABCDEEEEFGHIIIIJKLMNOOOOPQRSTUUUUVWXYZ";
   return characters[Math.floor(Math.random() * characters.length)];
 }
 

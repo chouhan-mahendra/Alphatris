@@ -51,7 +51,7 @@ public class GameController : MonoBehaviour
         switch (currentGameMode) {
             case Mode.LOCAL: 
                 //Keep instantiating new aplhabets
-                InvokeRepeating("CreateAlphabet", 2.0f, 1f);
+                InvokeRepeating("SpawnAlphabetLocal", 2.0f, 1f);
                 break;
             case Mode.MULTIPLAYER:
                 menuController.DisableWaitingForPlayersMenu();
@@ -77,7 +77,7 @@ public class GameController : MonoBehaviour
     }
 
 
-    void CreateAlphabet()
+    void SpawnAlphabetLocal()
     {
         int x = (int) (Random.Range(0, ROWS) * SCALE);
         Vector3 position = new Vector3(x , 5, 0);
@@ -93,9 +93,18 @@ public class GameController : MonoBehaviour
         alphabets.Add(alphabetGO);
     }
 
-    internal void UpdateScore(int length)
+    public bool UpdateScore(string word)
     {
-        SCORE += length;
+        if (currentGameMode == Mode.LOCAL) {
+            SCORE += word.Length;
+            return true;
+        }
+        networkController.OnWordSelected(word);
+        return false;
+    }
+
+    public void UpdateScore(int scoreDelta) {
+        SCORE += scoreDelta;
     }
 
     public void Quit()

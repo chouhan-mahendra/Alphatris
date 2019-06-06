@@ -20,6 +20,7 @@ public class NetworkController : MonoBehaviour
         socket.On("playerConnected", OnPlayerConnected);
         socket.On("playerDisconnected", OnPlayerDisconnected);
         socket.On("initAlphabet", OnInitAlphabet);
+        socket.On("updateScore", OnUpdateScore);
     }
 
     //TODO : write reconnection logic
@@ -76,4 +77,15 @@ public class NetworkController : MonoBehaviour
         Debug.Log("connected to server");
     }
 
+    public void OnWordSelected(string word)
+    {
+        string jsonString = string.Format(@"{{ ""word"" : ""{0}"" }}", word);
+        socket.Emit("wordSelected", new JSONObject(jsonString));
+    }
+
+    private void OnUpdateScore(SocketIOEvent e) {
+        int scoreDelta = int.Parse(e.data["score"].ToString());
+        Debug.Log("ScoreDelta " + scoreDelta);
+        GameController.INSTANCE.UpdateScore(scoreDelta);
+    }
 }

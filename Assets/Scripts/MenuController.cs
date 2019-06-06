@@ -9,6 +9,7 @@ public class MenuController : MonoBehaviour ,IClickable
     public GameObject startMenu;
     public GameObject settingsMenu;
     public GameObject waitingForPlayersMenu;
+    public GameObject inGameMenu;
 
     public TextMeshProUGUI score;
     public TextMeshProUGUI selection;
@@ -64,22 +65,24 @@ public class MenuController : MonoBehaviour ,IClickable
 
     public void DisableWaitingForPlayersMenu() {
         waitingForPlayersMenu.SetActive(false);
+        inGameMenu.SetActive(true);
     }
 
     public void OnClick(Alphabet alphabet)
     {
         if(alphabet.GetIsSelected()) {
-            selection.SetText(selection.text + alphabet.character);
+            selection.text = (selection.text + alphabet.character);
             selectedItems.Add(alphabet);
         }
     }
 
     public void OnUpdateScoreClicked()
     {
-        GameController.INSTANCE.UpdateScore(selection.text.Length);
-        selection.SetText("");
-        for(int i = 0;  i < selectedItems.Count; ++i) 
-            selectedItems[i].Explode(i * 0.05f);
-        selectedItems.Clear();
+        if (GameController.INSTANCE.UpdateScore(selection.text)) {
+            selection.text = "";
+            for(int i = 0;  i < selectedItems.Count; ++i) 
+                selectedItems[i].Explode(i * 0.05f);
+            selectedItems.Clear();
+        }
     }
 }

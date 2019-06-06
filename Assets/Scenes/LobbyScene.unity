@@ -900,7 +900,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &358814605
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1124,7 +1124,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -521}
+  m_AnchoredPosition: {x: 0, y: -517}
   m_SizeDelta: {x: 885, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &468365587
@@ -1196,6 +1196,17 @@ MonoBehaviour:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 358814604}
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 1
@@ -1332,7 +1343,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 17
-  m_textAlignment: 513
+  m_textAlignment: 514
   m_isAlignmentEnumConverted: 1
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -1363,7 +1374,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 6.8125305, y: 0.18743896, z: 16.662354, w: -0.95318604}
+  m_margin: {x: -0.976532, y: 0.18743896, z: -2.860962, w: -0.95318604}
   m_textInfo:
     textComponent: {fileID: 471655388}
     characterCount: 0
@@ -2918,6 +2929,7 @@ MonoBehaviour:
   startMenu: {fileID: 821944031}
   settingsMenu: {fileID: 947320777}
   waitingForPlayersMenu: {fileID: 1004188378}
+  inGameMenu: {fileID: 358814604}
   score: {fileID: 840823709}
   selection: {fileID: 471655388}
 --- !u!114 &904995226

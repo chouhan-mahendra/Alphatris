@@ -2,12 +2,11 @@
     Sever for our word game,
 **/
 
-
 const PORT = process.env.PORT || 3000;
 const socketIo = require("socket.io")(PORT);
 const utils = require("./utils.js");
 const spellchecker = require("spellchecker");
-
+const checkword = require("check-word")("en");
 const { interval } = require('rxjs');
 const { map, take } = require('rxjs/operators');
 
@@ -17,9 +16,12 @@ const GameActions = {
     playerDisconnected : "playerDisconnected",
     startGame : "startGame",
     wordSelected : "wordSelected",
+    updateScore : "updateScore",
+    destroyAlphabet : "destroyAlphabet", 
     initAlphabet : "initAlphabet"
 };
 
+console.log(`${checkword.check("romeo")}`);
 //console.log(`apple ${spellchecker.isMisspelled("apple")}`);
 console.log(`server started {${PORT}}`);
 
@@ -51,19 +53,28 @@ socketIo.on("connection", socket => {
             state[player].socket.emit(GameActions.startGame, event);
         });
 
-        interval(2000).subscribe(counter => {
-            const alphabet = { 
+        interval(3000).subscribe(counter => {
+            const alphabet = {
                 id : counter,
                 x : Math.floor(Math.random() * 5), 
                 char : utils.getRandomChar() 
             };
-            console.log(`sending ${JSON.stringify(alphabet)}`)
+            //console.log(`sending ${JSON.stringify(alphabet)}`)
             Object.keys(state).forEach(player => {
-                console.log(`sending to ${state[player].name}`);
+                console.log(`sending ${JSON.stringify(alphabet)} to ${state[player].name}`);
                 state[player].socket.emit(GameActions.initAlphabet, alphabet);
-            });            
+            });
         });
     }
+
+    socket.on(GameActions.wordSelected, (event) => {
+        console.log(`${data.name} selected ${event.word} [${spellchecker.isMisspelled(event.word)}]`);
+        const { word } = event;
+        if(!checkword.check(word)) 
+           socket.emit(GameActions.updateScore, { score : 0 });         
+        else 
+           socket.emit(GameActions.updateScore, { score : word.length });       
+    });
 
     socket.on("disconnect", () => {
         console.log(`client ${data.id} disconnected!!`);
