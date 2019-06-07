@@ -14,6 +14,8 @@ public class GameController : MonoBehaviour
     public Mode currentGameMode;
 
     public GameObject alphabetPrefab;
+    public GameObject specialAlphaPrefab;
+    
     public List<GameObject> alphabets;
     public int ROWS = 4;
     public float WIDTH = 10;

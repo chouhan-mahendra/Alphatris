@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using EZCameraShake;
 
 public class Destructible : MonoBehaviour
 {
-    public GameObject destroyEffect;
+    public GameObject onDestroyEffect;
+    //public AudioSource onDestroyAudio;
 
     public void Explode(float time)
     {
@@ -13,8 +15,9 @@ public class Destructible : MonoBehaviour
 
     private IEnumerator Destroy(float time)
     {
+        //onDestroyAudio.Play();
         yield return new WaitForSeconds(time);
-        GameObject destroyEffectInst = Instantiate(destroyEffect, transform.position, Quaternion.identity);
+        GameObject destroyEffectInst = Instantiate(onDestroyEffect, transform.position, Quaternion.identity);
         Collider[] colliders = Physics.OverlapSphere(transform.position, 1);
         foreach (Collider nearby in colliders)
         {
@@ -26,5 +29,6 @@ public class Destructible : MonoBehaviour
         }
         Destroy(this.gameObject);
         Destroy(destroyEffectInst, 1.5f);
+        CameraShaker.Instance.ShakeOnce(2f,2f,0.05f,0.5f);
     }
 }
