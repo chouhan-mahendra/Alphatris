@@ -2,8 +2,13 @@
     Sever for our word game,
 **/
 
-const PORT = process.env.PORT || 3000;
-const socketIo = require("socket.io")(PORT);
+const PORT_WEBSOCKET = process.env.PORT || 3000;
+const PORT_HTTP = 8080;
+
+const express = require("express");
+const app = express();
+
+const socketIo = require("socket.io")(PORT_WEBSOCKET);
 const utils = require("./utils.js");
 const spellchecker = require("spellchecker");
 const checkword = require("check-word")("en");
@@ -21,13 +26,18 @@ const GameActions = {
     initAlphabet : "initAlphabet"
 };
 
-console.log(`${checkword.check("romeo")}`);
-//console.log(`apple ${spellchecker.isMisspelled("apple")}`);
-console.log(`server started {${PORT}}`);
+app.get('/check', (req,res) => {
+    const word = req.query.word.toLowerCase();
+    console.log(req.query, !spellchecker.isMisspelled(word));
+    res.send(spellchecker.isMisspelled(word) ? "0" : `${word.length}`);
+});
+app.listen(PORT_HTTP, () => console.log(`http server running on ${PORT_HTTP}`));
+
+console.log(`websocket server starting on {${PORT_WEBSOCKET}}`);
+
 
 const MIN_PLAYER_COUNT = 1;
 const state = {};
-
 socketIo.on("connection", socket => {
 
     const data = { 
