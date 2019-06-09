@@ -10,9 +10,12 @@ public class MenuController : MonoBehaviour ,IClickable
     public GameObject settingsMenu;
     public GameObject waitingForPlayersMenu;
     public GameObject inGameMenu;
+    public GameObject gameOverMenu;
 
     public TextMeshProUGUI score;
     public TextMeshProUGUI selection;
+    public TextMeshProUGUI gameOverText;
+
     private List<Alphabet> selectedItems = new List<Alphabet>();
 
     // Update is called once per frame
@@ -43,7 +46,7 @@ public class MenuController : MonoBehaviour ,IClickable
     {
         pauseMenu.SetActive(true);
         GameController.SetState(GameController.GameState.PAUSED);
-        Time.timeScale = 0.1f;
+        Time.timeScale = 0f;
     }
 
     public void Resume()
@@ -53,14 +56,12 @@ public class MenuController : MonoBehaviour ,IClickable
         GameController.SetState(GameController.GameState.STARTED);
     }
 
-    public void End()
+    public void EndGame(int score)
     {
-        //Debug.Log("Game Ended in " + time.ToString());
-        //finalScoreText
-        //    .SetText("You Finished the Game in " +
-        //        time.ToString() + " seconds");
-        //finalScoreMenu.SetActive(true);
-        //inGameMenu.SetActive(false);
+        gameOverText
+            .SetText("Your Final Score is "+ score);
+        gameOverMenu.SetActive(true);
+        inGameMenu.SetActive(false);
     }
 
     public void DisableWaitingForPlayersMenu() {

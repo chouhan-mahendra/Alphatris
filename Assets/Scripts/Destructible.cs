@@ -6,7 +6,6 @@ using EZCameraShake;
 public class Destructible : MonoBehaviour
 {
     public GameObject onDestroyEffect;
-    //public AudioSource onDestroyAudio;
 
     public void Explode(float time)
     {
@@ -15,7 +14,6 @@ public class Destructible : MonoBehaviour
 
     private IEnumerator Destroy(float time)
     {
-        //onDestroyAudio.Play();
         yield return new WaitForSeconds(time);
         GameObject destroyEffectInst = Instantiate(onDestroyEffect, transform.position, Quaternion.identity);
         Collider[] colliders = Physics.OverlapSphere(transform.position, 1);

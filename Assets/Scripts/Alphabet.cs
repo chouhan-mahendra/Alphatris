@@ -48,4 +48,12 @@ public class Alphabet : MonoBehaviour
     }
 
     public bool GetIsSelected() { return isSelected; }
+
+    void OnCollisionEnter(Collision col)
+    {
+        Debug.Log(gameObject.name +"-"+ col.gameObject.name);
+        if(transform.position.y > 3) {
+            GameController.INSTANCE.EndGame();
+        }
+    }
 }

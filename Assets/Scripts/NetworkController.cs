@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using SocketIO;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class NetworkController : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class NetworkController : MonoBehaviour
         socket.On("playerDisconnected", OnPlayerDisconnected);
         socket.On("initAlphabet", OnInitAlphabet);
         socket.On("updateScore", OnUpdateScore);
+
+        StartCoroutine(GetRequest("http://localhost:8080/check", "hello"));
     }
 
     //TODO : write reconnection logic
@@ -87,5 +90,20 @@ public class NetworkController : MonoBehaviour
         int scoreDelta = int.Parse(e.data["score"].ToString());
         Debug.Log("ScoreDelta " + scoreDelta);
         GameController.INSTANCE.UpdateScore(scoreDelta);
+    }
+
+    IEnumerator GetRequest(string url, string word) {
+        using (UnityWebRequest webRequest = 
+                    UnityWebRequest.Get(url + "?word="+word)) {
+            yield return webRequest.SendWebRequest();
+            if(webRequest.isNetworkError)
+            {
+                Debug.Log("Error : "+ webRequest.error);
+            }
+            else
+            {
+                Debug.Log("Received : "+ webRequest.downloadHandler.text);
+            }
+        }
     }
 }

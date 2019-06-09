@@ -75,9 +75,10 @@ public class GameController : MonoBehaviour
 
     public void EndGame()
     {
-        SceneManager.LoadScene("LobbyScene");
+        Debug.Log("********EndGame********");
+        Time.timeScale = 0f;
+        menuController.EndGame(SCORE);
     }
-
 
     void SpawnAlphabetLocal()
     {
