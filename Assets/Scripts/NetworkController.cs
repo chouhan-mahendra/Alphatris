@@ -7,6 +7,17 @@ using UnityEngine.Networking;
 
 public class NetworkController : MonoBehaviour
 {
+    public static NetworkController Instance;
+    public string URL_Http = "http://localhost:8080/check";
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else if (Instance != this)
+            Destroy(gameObject);
+    }
+
     private SocketIOComponent socket;
     private string playerName;
     private string id;
@@ -22,8 +33,7 @@ public class NetworkController : MonoBehaviour
         socket.On("playerDisconnected", OnPlayerDisconnected);
         socket.On("initAlphabet", OnInitAlphabet);
         socket.On("updateScore", OnUpdateScore);
-
-        StartCoroutine(GetRequest("http://localhost:8080/check", "hello"));
+        //StartCoroutine(GetRequest("hello"));
     }
 
     //TODO : write reconnection logic
@@ -56,8 +66,8 @@ public class NetworkController : MonoBehaviour
         Vector3 position = new Vector3(x, 5, 0);
         string ch = (e.data["char"].ToString());
         Debug.Log("Players are online, Starting new game from " + position + "," + ch[1]);
-        GameController.INSTANCE.StartGame(1);
-        GameController.INSTANCE.CreateAlphabet(position, ch[1]);
+        GameController.Instance.StartGame(1);
+        GameController.Instance.CreateAlphabet(position, ch[1]);
     }
 
     private void OnInitAlphabet(SocketIOEvent e) {
@@ -65,7 +75,7 @@ public class NetworkController : MonoBehaviour
         int x = int.Parse(e.data["x"].ToString());
         Vector3 position = new Vector3(x, 5, 0);
         string ch = (e.data["char"].ToString());
-        GameController.INSTANCE.CreateAlphabet(position, ch[1]);
+        GameController.Instance.CreateAlphabet(position, ch[1]);
     }
 
     private void OnInit(SocketIOEvent e)
@@ -89,20 +99,22 @@ public class NetworkController : MonoBehaviour
     private void OnUpdateScore(SocketIOEvent e) {
         int scoreDelta = int.Parse(e.data["score"].ToString());
         Debug.Log("ScoreDelta " + scoreDelta);
-        GameController.INSTANCE.UpdateScore(scoreDelta);
+        GameController.Instance.UpdateScore(scoreDelta);
     }
 
-    IEnumerator GetRequest(string url, string word) {
+    public IEnumerator GetRequest(string word, System.Action<int> done) {
         using (UnityWebRequest webRequest = 
-                    UnityWebRequest.Get(url + "?word="+word)) {
+                    UnityWebRequest.Get(URL_Http + "?word="+word)) {
             yield return webRequest.SendWebRequest();
             if(webRequest.isNetworkError)
             {
                 Debug.Log("Error : "+ webRequest.error);
+                done(0);
             }
             else
             {
                 Debug.Log("Received : "+ webRequest.downloadHandler.text);
+                done(int.Parse(webRequest.downloadHandler.text));
             }
         }
     }

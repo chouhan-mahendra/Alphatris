@@ -1,10 +1,20 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 public class MenuController : MonoBehaviour ,IClickable
 {
+    public static MenuController Instance;
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else if (Instance != this)
+            Destroy(gameObject);
+    }
+
     public GameObject pauseMenu;
     public GameObject startMenu;
     public GameObject settingsMenu;
@@ -21,11 +31,10 @@ public class MenuController : MonoBehaviour ,IClickable
     // Update is called once per frame
     void Update()
     {
-        GameController.GameState state = GameController.GetState();
-
+        GameController.GameState state = GameController.Instance.GetState();
         switch(state) {
             case GameController.GameState.STARTED:
-                score.SetText("SCORE " + GameController.GetScore().ToString());
+                score.SetText("SCORE " + GameController.Instance.SCORE);
                 break;
         }
 
@@ -45,7 +54,7 @@ public class MenuController : MonoBehaviour ,IClickable
     public void Pause()
     {
         pauseMenu.SetActive(true);
-        GameController.SetState(GameController.GameState.PAUSED);
+        GameController.Instance.SetState(GameController.GameState.PAUSED);
         Time.timeScale = 0f;
     }
 
@@ -53,7 +62,7 @@ public class MenuController : MonoBehaviour ,IClickable
     {
         pauseMenu.SetActive(false);
         Time.timeScale = 1f;
-        GameController.SetState(GameController.GameState.STARTED);
+        GameController.Instance.SetState(GameController.GameState.STARTED);
     }
 
     public void EndGame(int score)
@@ -79,11 +88,22 @@ public class MenuController : MonoBehaviour ,IClickable
 
     public void OnUpdateScoreClicked()
     {
-        if (GameController.INSTANCE.UpdateScore(selection.text)) {
-            selection.text = "";
-            for(int i = 0;  i < selectedItems.Count; ++i) 
-                selectedItems[i].Explode(i * 0.05f);
-            selectedItems.Clear();
-        }
+        GameController.Instance.UpdateScore(selection.text);
+    }
+
+    internal void DestroySelection()
+    {
+        selection.text = "";
+        for (int i = 0; i < selectedItems.Count; ++i)
+            selectedItems[i].Explode(i * 0.05f);
+        selectedItems.Clear();
+    }
+
+    internal void UnSelectAll()
+    {
+        selection.text = "";
+        for (int i = 0; i < selectedItems.Count; ++i)
+            selectedItems[i].SetIsSelected(false);
+        selectedItems.Clear();
     }
 }

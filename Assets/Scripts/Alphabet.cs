@@ -53,7 +53,7 @@ public class Alphabet : MonoBehaviour
     {
         Debug.Log(gameObject.name +"-"+ col.gameObject.name);
         if(transform.position.y > 3) {
-            GameController.INSTANCE.EndGame();
+            GameController.Instance.EndGame();
         }
     }
 }

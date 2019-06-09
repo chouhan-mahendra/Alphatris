@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour
 {
-    public static GameController INSTANCE;
+    public static GameController Instance;
     public enum GameState { STARTED, PAUSED, IN_LOBBY }
     public enum Mode { LOCAL, MULTIPLAYER }
 
@@ -20,28 +20,21 @@ public class GameController : MonoBehaviour
     public int ROWS = 4;
     public float WIDTH = 10;
     public int SCORE = 0;
-    public MenuController menuController;
-    public NetworkController networkController;
 
     private float SCALE = 1;
 
     private void Awake()
     {
-        if (INSTANCE == null)
-            INSTANCE = this;
-        else if (INSTANCE != this)
+        if (Instance == null)
+            Instance = this;
+        else if (Instance != this)
             Destroy(gameObject);
         Time.timeScale = 1.5f;
         currentState = GameState.IN_LOBBY;
     }
 
-    public static int GetScore()
-    {
-        return INSTANCE.SCORE;
-    }
-
     public void RequestConnection() {
-        networkController.RequestConnection();
+        NetworkController.Instance.RequestConnection();
     }
 
     public void StartGame(int mode)
@@ -56,7 +49,7 @@ public class GameController : MonoBehaviour
                 InvokeRepeating("SpawnAlphabetLocal", 2.0f, 1f);
                 break;
             case Mode.MULTIPLAYER:
-                menuController.DisableWaitingForPlayersMenu();
+                MenuController.Instance.DisableWaitingForPlayersMenu();
                 break;
         }
 
@@ -68,16 +61,16 @@ public class GameController : MonoBehaviour
         alphabets = new List<GameObject>();
     }
 
-    public static void SetState(GameState nextState)
+    public void SetState(GameState nextState)
     {
-        INSTANCE.currentState = nextState;
+        Instance.currentState = nextState;
     }
 
     public void EndGame()
     {
         Debug.Log("********EndGame********");
         Time.timeScale = 0f;
-        menuController.EndGame(SCORE);
+        MenuController.Instance.EndGame(SCORE);
     }
 
     void SpawnAlphabetLocal()
@@ -92,22 +85,25 @@ public class GameController : MonoBehaviour
         GameObject alphabetGO = Instantiate(alphabetPrefab, position, Quaternion.identity);
         alphabetGO.transform.localScale = Vector3.one * SCALE;
         alphabetGO.GetComponent<Alphabet>().character = character;
-        alphabetGO.GetComponent<Alphabet>().clickListener = menuController;
+        alphabetGO.GetComponent<Alphabet>().clickListener = MenuController.Instance;
         alphabets.Add(alphabetGO);
     }
 
-    public bool UpdateScore(string word)
+    public void UpdateScore(string word)
     {
         if (currentGameMode == Mode.LOCAL) {
-            SCORE += word.Length;
-            return true;
+            StartCoroutine(NetworkController.Instance.GetRequest(word, UpdateScore));
         }
-        networkController.OnWordSelected(word);
-        return false;
+        else NetworkController.Instance.OnWordSelected(word);
     }
 
     public void UpdateScore(int scoreDelta) {
-        SCORE += scoreDelta;
+        if (scoreDelta > 0)
+        {
+            SCORE += scoreDelta;
+            MenuController.Instance.DestroySelection();
+        }
+        else MenuController.Instance.UnSelectAll();
     }
 
     public void Quit()
@@ -115,8 +111,8 @@ public class GameController : MonoBehaviour
         Application.Quit();
     }
 
-    public static GameState GetState()
+    public GameState GetState()
     {
-        return INSTANCE.currentState;
+        return Instance.currentState;
     }
 }
