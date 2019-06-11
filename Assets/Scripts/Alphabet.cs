@@ -8,6 +8,8 @@ public class Alphabet : MonoBehaviour
 {
     public char character;
     public Color onSelectColor;
+    public int id;
+    
     public IClickable clickListener = null;
 
     private Color naturalColor;

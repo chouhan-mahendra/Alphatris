@@ -88,7 +88,9 @@ public class MenuController : MonoBehaviour ,IClickable
 
     public void OnUpdateScoreClicked()
     {
-        GameController.Instance.UpdateScore(selection.text);
+        List<int> idlist = new List<int>();
+        selectedItems.ForEach(alphabet => idlist.Add(alphabet.id));
+        GameController.Instance.UpdateScore(selection.text, idlist);
     }
 
     internal void DestroySelection()

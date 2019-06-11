@@ -12,15 +12,15 @@ public class GameController : MonoBehaviour
 
     public GameState currentState;
     public Mode currentGameMode;
-
+    public GameObject dummyObject;
     public GameObject alphabetPrefab;
     public GameObject specialAlphaPrefab;
     
-    public List<GameObject> alphabets;
+    public Dictionary<int, GameObject> alphabets;
     public int ROWS = 4;
     public float WIDTH = 10;
     public int SCORE = 0;
-
+    public int SPAWN_RATE = 2;
     private float SCALE = 1;
 
     private void Awake()
@@ -46,7 +46,7 @@ public class GameController : MonoBehaviour
         switch (currentGameMode) {
             case Mode.LOCAL: 
                 //Keep instantiating new aplhabets
-                InvokeRepeating("SpawnAlphabetLocal", 2.0f, 1f);
+                InvokeRepeating("SpawnAlphabetLocal", 2.0f, SPAWN_RATE);
                 break;
             case Mode.MULTIPLAYER:
                 MenuController.Instance.DisableWaitingForPlayersMenu();
@@ -54,11 +54,11 @@ public class GameController : MonoBehaviour
         }
 
         //Fancy animation on start game :)
-        for(int i = 0;i < alphabets.Count; ++i) 
-        {
-            alphabets[i].GetComponent<Destructible>().Explode(i*0.1f);
+        int i = 0; 
+        foreach(Transform child in dummyObject.transform) { 
+            child.GetComponent<Destructible>().Explode(i++ *0.1f);
         }
-        alphabets = new List<GameObject>();
+        alphabets = new Dictionary<int, GameObject>();
     }
 
     public void SetState(GameState nextState)
@@ -78,23 +78,24 @@ public class GameController : MonoBehaviour
         int x = (int) (Random.Range(0, ROWS) * SCALE);
         Vector3 position = new Vector3(x , 5, 0);
         char character = (char)(Random.Range(0, 26) + 65);
-        CreateAlphabet(position, character);
+        CreateAlphabet(position, character, Random.Range(0,100));
     }
 
-    public void CreateAlphabet(Vector3 position, char character) {
-        GameObject alphabetGO = Instantiate(alphabetPrefab, position, Quaternion.identity);
-        alphabetGO.transform.localScale = Vector3.one * SCALE;
-        alphabetGO.GetComponent<Alphabet>().character = character;
-        alphabetGO.GetComponent<Alphabet>().clickListener = MenuController.Instance;
-        alphabets.Add(alphabetGO);
+    public void CreateAlphabet(Vector3 position, char character, int id) {
+        GameObject alphabet = Instantiate(alphabetPrefab, position, Quaternion.identity);
+        alphabet.transform.localScale = Vector3.one * SCALE;
+        alphabet.GetComponent<Alphabet>().id = id;
+        alphabet.GetComponent<Alphabet>().character = character;
+        alphabet.GetComponent<Alphabet>().clickListener = MenuController.Instance;
+        alphabets[id] = alphabet;
     }
 
-    public void UpdateScore(string word)
+    public void UpdateScore(string word, List<int> idList)
     {
         if (currentGameMode == Mode.LOCAL) {
             StartCoroutine(NetworkController.Instance.GetRequest(word, UpdateScore));
         }
-        else NetworkController.Instance.OnWordSelected(word);
+        else NetworkController.Instance.OnWordSelected(word, idList);
     }
 
     public void UpdateScore(int scoreDelta) {
@@ -106,6 +107,12 @@ public class GameController : MonoBehaviour
         else MenuController.Instance.UnSelectAll();
     }
 
+    public void DestroyAlphabet(List<int> list) {
+        foreach(int id in list) {
+            alphabets[id].GetComponent<Alphabet>().Explode();
+        }
+    }
+    
     public void Quit()
     {
         Application.Quit();

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using SocketIO;
 using UnityEngine;
 using UnityEngine.Networking;
+using SimpleJSON;
 
 public class NetworkController : MonoBehaviour
 {
@@ -31,9 +32,15 @@ public class NetworkController : MonoBehaviour
         socket.On("startGame", OnStartGame);
         socket.On("playerConnected", OnPlayerConnected);
         socket.On("playerDisconnected", OnPlayerDisconnected);
-        socket.On("initAlphabet", OnInitAlphabet);
+        socket.On("spawnAlphabet", OnSpawnAlphabet);
         socket.On("updateScore", OnUpdateScore);
-        //StartCoroutine(GetRequest("hello"));
+        socket.On("destroyAlphabet", OnDestroyAlphabet);
+
+        var array2 = JSON.Parse("[1,2,3]");
+        var array3 = JSON.Parse("\"[1,2,3]\"".Replace("\"",""));
+        Debug.Log("2 :" + array2.Count);
+        Debug.Log("3 :" + array3.Count);
+
     }
 
     //TODO : write reconnection logic
@@ -61,21 +68,23 @@ public class NetworkController : MonoBehaviour
 
     private void OnStartGame(SocketIOEvent e)
     {
-        Debug.Log(e.data["x"].ToString() + e.data["char"].ToString()); 
+        Debug.Log(e.data["x"].ToString() + e.data["char"].ToString());
+        int id = int.Parse(e.data["id"].ToString()); 
         int x = int.Parse(e.data["x"].ToString());
         Vector3 position = new Vector3(x, 5, 0);
         string ch = (e.data["char"].ToString());
         Debug.Log("Players are online, Starting new game from " + position + "," + ch[1]);
         GameController.Instance.StartGame(1);
-        GameController.Instance.CreateAlphabet(position, ch[1]);
+        GameController.Instance.CreateAlphabet(position, ch[1], id);
     }
 
-    private void OnInitAlphabet(SocketIOEvent e) {
-        Debug.Log(e.data["x"].ToString() + e.data["char"].ToString()); 
+    private void OnSpawnAlphabet(SocketIOEvent e) {
+        Debug.Log(e.data["x"].ToString() + e.data["char"].ToString());
+        int id = int.Parse(e.data["id"].ToString()); 
         int x = int.Parse(e.data["x"].ToString());
         Vector3 position = new Vector3(x, 5, 0);
         string ch = (e.data["char"].ToString());
-        GameController.Instance.CreateAlphabet(position, ch[1]);
+        GameController.Instance.CreateAlphabet(position, ch[1], id);
     }
 
     private void OnInit(SocketIOEvent e)
@@ -90,9 +99,17 @@ public class NetworkController : MonoBehaviour
         Debug.Log("connected to server");
     }
 
-    public void OnWordSelected(string word)
+    public void OnWordSelected(string word, List<int> idList)
     {
-        string jsonString = string.Format(@"{{ ""word"" : ""{0}"" }}", word);
+        string jsonArray = "[";
+        for (int i = 0; i < idList.Count; ++i)
+        {
+            jsonArray += idList[i];
+            if (i < idList.Count - 1)
+                jsonArray += ",";
+        }
+        jsonArray += "]";
+        string jsonString = string.Format(@"{{ ""word"" : ""{0}"" , ""idList"" : ""{1}""}}", word, jsonArray);
         socket.Emit("wordSelected", new JSONObject(jsonString));
     }
 
@@ -102,18 +119,30 @@ public class NetworkController : MonoBehaviour
         GameController.Instance.UpdateScore(scoreDelta);
     }
 
+    private void OnDestroyAlphabet(SocketIOEvent e) {
+        Debug.Log("onDestroyAlphabet : " + e.data["idList"].ToString());
+        var array = JSON.Parse(e.data["idList"].ToString().Replace("\"", ""));
+
+        List<int> list = new List<int>();
+        for (int i = 0; i < array.Count; ++i)
+            list.Add(array[i]);
+        
+        Debug.Log("onDestroyAlphabet : " + array[0] + "," + array.Count);
+        GameController.Instance.DestroyAlphabet(list);
+    }
+
     public IEnumerator GetRequest(string word, System.Action<int> done) {
         using (UnityWebRequest webRequest = 
                     UnityWebRequest.Get(URL_Http + "?word="+word)) {
             yield return webRequest.SendWebRequest();
             if(webRequest.isNetworkError)
             {
-                Debug.Log("Error : "+ webRequest.error);
+                Debug.Log("GetRequest Error : "+ webRequest.error);
                 done(0);
             }
             else
             {
-                Debug.Log("Received : "+ webRequest.downloadHandler.text);
+                Debug.Log("GetRequest Received : "+ webRequest.downloadHandler.text);
                 done(int.Parse(webRequest.downloadHandler.text));
             }
         }
