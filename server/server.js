@@ -36,12 +36,16 @@ app.listen(PORT_HTTP, () => console.log(`http server running on ${PORT_HTTP}`));
 
 console.log(`websocket server starting on {${PORT_WEBSOCKET}}`);
 
-
 const MIN_PLAYER_COUNT = 2;
 const state = {};
-let subscription;
+let subscription = undefined;
 
 socketIo.on("connection", socket => {
+
+    if (Object.keys(state).length == MIN_PLAYER_COUNT) {
+        socket.close();
+        return;
+    }
 
     const data = { 
                     id : utils.getRandomID(), 
@@ -93,6 +97,9 @@ socketIo.on("connection", socket => {
         console.log(`client ${data.id} disconnected!!`);
         delete state[data.id];
         socket.broadcast.emit(GameActions.playerDisconnected, { id : data.id, name : data.name });
-        subscription.unsubscribe();
+        if(subscription) {
+            subscription.unsubscribe();
+            subscription = undefined;
+        }
     });
 });
