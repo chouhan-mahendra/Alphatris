@@ -2,9 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UniRx;
+using UniRx.Triggers;
 using UnityEngine;
 
-public class MenuController : MonoBehaviour ,IClickable
+public class MenuController : MonoBehaviour
 {
     public static MenuController Instance;
     private void Awake()
@@ -16,6 +18,7 @@ public class MenuController : MonoBehaviour ,IClickable
     }
 
     public GameObject pauseMenu;
+
     public GameObject startMenu;
     public GameObject settingsMenu;
     public GameObject waitingForPlayersMenu;
@@ -26,7 +29,8 @@ public class MenuController : MonoBehaviour ,IClickable
     public TextMeshProUGUI selection;
     public TextMeshProUGUI gameOverText;
 
-    private List<Alphabet> selectedItems = new List<Alphabet>();
+    private List<Alphabet> currentSelection = new List<Alphabet>();
+    private IDisposable clickSub;
 
     // Update is called once per frame
     void Update()
@@ -48,7 +52,39 @@ public class MenuController : MonoBehaviour ,IClickable
                 Pause();
             }
         }
+    }
 
+    private void Start()
+    {
+        clickSub = this.UpdateAsObservable()
+            .Where(_ => Input.GetMouseButton(0))
+            .Select(_ => {
+                var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit = new RaycastHit();
+                return (Physics.Raycast(ray, out hit)) ? hit.transform.gameObject : null;
+            })
+            .Where(gameObject => gameObject != null && gameObject.tag.Equals("Cube"))
+            .DistinctUntilChanged(gameObject => gameObject.name)
+            .Subscribe(item => {
+                //Debug.Log("unirx : " + item.name);
+                Alphabet alphabet = item.GetComponent<Alphabet>();
+                int index = currentSelection.FindIndex(it => it.name.Equals(item.name));
+                if (index != -1) {
+                    //Debug.Log("item already present, removing all proceeding indexes");
+                    for (int it = index + 1; it < currentSelection.Count; ++it)
+                        currentSelection[it].SetIsSelected(false);
+                    currentSelection
+                        .RemoveRange(index + 1, currentSelection.Count - index - 1);
+                }
+                else {
+                    currentSelection.Add(alphabet);
+                    alphabet.SetIsSelected(true);
+                }
+                string currentText = "";
+                foreach (Alphabet alp in currentSelection)
+                    currentText += alp.character;
+                selection.text = currentText;
+            });
     }
 
     public void Pause()
@@ -78,34 +114,31 @@ public class MenuController : MonoBehaviour ,IClickable
         inGameMenu.SetActive(true);
     }
 
-    public void OnClick(Alphabet alphabet)
-    {
-        if(alphabet.GetIsSelected()) {
-            selection.text = (selection.text + alphabet.character);
-            selectedItems.Add(alphabet);
-        }
-    }
-
     public void OnUpdateScoreClicked()
     {
         List<int> idlist = new List<int>();
-        selectedItems.ForEach(alphabet => idlist.Add(alphabet.id));
+        currentSelection.ForEach(alphabet => idlist.Add(alphabet.id));
         GameController.Instance.UpdateScore(selection.text, idlist);
     }
 
     internal void DestroySelection()
     {
         selection.text = "";
-        for (int i = 0; i < selectedItems.Count; ++i)
-            selectedItems[i].Explode(i * 0.05f);
-        selectedItems.Clear();
+        for (int i = 0; i < currentSelection.Count; ++i)
+            currentSelection[i].Explode(i * 0.05f);
+        currentSelection.Clear();
     }
 
     internal void UnSelectAll()
     {
         selection.text = "";
-        for (int i = 0; i < selectedItems.Count; ++i)
-            selectedItems[i].SetIsSelected(false);
-        selectedItems.Clear();
+        for (int i = 0; i < currentSelection.Count; ++i)
+            currentSelection[i].SetIsSelected(false);
+        currentSelection.Clear();
+    }
+
+    private void OnDestroy()
+    {
+        clickSub.Dispose();
     }
 }

@@ -36,11 +36,10 @@ public class NetworkController : MonoBehaviour
         socket.On("updateScore", OnUpdateScore);
         socket.On("destroyAlphabet", OnDestroyAlphabet);
 
-        var array2 = JSON.Parse("[1,2,3]");
-        var array3 = JSON.Parse("\"[1,2,3]\"".Replace("\"",""));
-        Debug.Log("2 :" + array2.Count);
-        Debug.Log("3 :" + array3.Count);
-
+        //var array2 = JSON.Parse("[1,2,3]");
+        //var array3 = JSON.Parse("\"[1,2,3]\"".Replace("\"",""));
+        //Debug.Log("2 :" + array2.Count);
+        //Debug.Log("3 :" + array3.Count);
     }
 
     //TODO : write reconnection logic

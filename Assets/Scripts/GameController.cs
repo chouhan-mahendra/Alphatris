@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using UniRx;
+using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
@@ -21,7 +23,9 @@ public class GameController : MonoBehaviour
     public float WIDTH = 10;
     public int SCORE = 0;
     public int SPAWN_RATE = 2;
+
     private float SCALE = 1;
+    private List<Alphabet> currentSelection;
 
     private void Awake()
     {
@@ -29,7 +33,7 @@ public class GameController : MonoBehaviour
             Instance = this;
         else if (Instance != this)
             Destroy(gameObject);
-        Time.timeScale = 1.5f;
+        Time.timeScale = 1.8f;
         currentState = GameState.IN_LOBBY;
     }
 
@@ -59,6 +63,7 @@ public class GameController : MonoBehaviour
             child.GetComponent<Destructible>().Explode(i++ *0.1f);
         }
         alphabets = new Dictionary<int, GameObject>();
+        currentSelection = new List<Alphabet>();
     }
 
     public void SetState(GameState nextState)
@@ -83,10 +88,10 @@ public class GameController : MonoBehaviour
 
     public void CreateAlphabet(Vector3 position, char character, int id) {
         GameObject alphabet = Instantiate(alphabetPrefab, position, Quaternion.identity);
+        alphabet.name = character + "_" + id.ToString();
         alphabet.transform.localScale = Vector3.one * SCALE;
         alphabet.GetComponent<Alphabet>().id = id;
         alphabet.GetComponent<Alphabet>().character = character;
-        alphabet.GetComponent<Alphabet>().clickListener = MenuController.Instance;
         alphabets[id] = alphabet;
     }
 
