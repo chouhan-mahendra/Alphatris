@@ -127,6 +127,7 @@ public class MenuController : MonoBehaviour
         for (int i = 0; i < currentSelection.Count; ++i)
             currentSelection[i].Explode(i * 0.05f);
         currentSelection.Clear();
+        Alphabet.AudioPitch = 0.8f;
     }
 
     internal void UnSelectAll()

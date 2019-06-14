@@ -10,6 +10,7 @@ public class NetworkController : MonoBehaviour
 {
     public static NetworkController Instance;
     public string URL_Http = "http://localhost:8080/check";
+    //public string URL_Socket = "ws://127.0.0.1:3000/socket.io/?EIO=4&transport=websocket";
 
     private void Awake()
     {
@@ -36,10 +37,6 @@ public class NetworkController : MonoBehaviour
         socket.On("updateScore", OnUpdateScore);
         socket.On("destroyAlphabet", OnDestroyAlphabet);
 
-        //var array2 = JSON.Parse("[1,2,3]");
-        //var array3 = JSON.Parse("\"[1,2,3]\"".Replace("\"",""));
-        //Debug.Log("2 :" + array2.Count);
-        //Debug.Log("3 :" + array3.Count);
     }
 
     //TODO : write reconnection logic
