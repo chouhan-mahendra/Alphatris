@@ -32,4 +32,8 @@ function randomChar() {
   return characters[Math.floor(Math.random() * characters.length)];
 }
 
+function isSpecial() {
+  return (Math.floor(Math.random() * (10 - 1)) + 1) == 1;
+}
+
 module.exports = { getRandomName : haiku, getRandomID : randomID , getRandomChar : randomChar };

@@ -23,7 +23,8 @@ const GameActions = {
     wordSelected : "wordSelected",
     updateScore : "updateScore",
     destroyAlphabet : "destroyAlphabet", 
-    spawnAlphabet : "spawnAlphabet"
+    spawnAlphabet : "spawnAlphabet",
+    submitSelection: "submitSelection"
 };
 
 app.get('/check', (req,res) => {
@@ -74,7 +75,8 @@ socketIo.on("connection", socket => {
             const alphabet = {
                 id : counter + 1,
                 x : Math.floor(Math.random() * 5), 
-                char : utils.getRandomChar() 
+                char : utils.getRandomChar(),
+                isSpecial: utils.isSpecial()
             };
             Object.keys(state).forEach(player => {
                 console.log(`sending ${JSON.stringify(alphabet)} to ${state[player].name}`);
@@ -84,14 +86,36 @@ socketIo.on("connection", socket => {
     }
 
     socket.on(GameActions.wordSelected, (event) => {
-        const { word , idList } = event;
-        console.log(`${data.name} selected ${event.word}, ${idList} [${spellchecker.isMisspelled(event.word)}]`);
+        // const { word , idList } = event;
+        // console.log(`${data.name} selected ${event.word}, ${idList} [${spellchecker.isMisspelled(event.word)}]`);
 
-        const score = (spellchecker.isMisspelled(word) || word.length < 2) ? 0 : word.length;
-        socket.emit(GameActions.updateScore, { score });   
-        if(score > 0)
-            socket.broadcast.emit(GameActions.destroyAlphabet, { idList });  
+        // const score = (spellchecker.isMisspelled(word) || word.length < 2) ? 0 : word.length;
+        // socket.emit(GameActions.updateScore, { score });   
+        // if(score > 0)
+        //     socket.broadcast.emit(GameActions.destroyAlphabet, { idList });  
     });
+
+    socket.on(GameActions.submitSelection, (event) => {
+        const { word , alphabetList, isDrag } = event;
+        console.log(`${data.name} selected ${event.word}, ${alphabetList} [${spellchecker.isMisspelled(event.word)}], ${isDrag}`);
+
+        const score = getScore(word, alphabetList, isDrag);
+        let idList = [];
+        for(let x in alphabetList) {
+            idList.add(x.id);
+        }
+        if(score > 0) {
+            socket.emit(GameActions.destroyAlphabet, { idList });
+            socket.emit(GameActions.updateScore, {score});
+        }
+    });
+
+    var getScore = (word, alphabetList, isDrag) => {
+        if (spellchecker.isMisspelled(word) || word.length < 2) {
+            return 0;
+        }
+        return word.length;
+    }
 
     socket.on("disconnect", () => {
         console.log(`client ${data.id} disconnected!!`);
