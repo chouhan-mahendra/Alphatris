@@ -32,6 +32,8 @@ public class MenuController : MonoBehaviour
     private List<Alphabet> currentSelection = new List<Alphabet>();
     private IDisposable clickSub;
 
+    private bool isDrag;
+
     // Update is called once per frame
     void Update()
     {
@@ -71,14 +73,17 @@ public class MenuController : MonoBehaviour
                 int index = currentSelection.FindIndex(it => it.name.Equals(item.name));
                 if (index != -1) {
                     //Debug.Log("item already present, removing all proceeding indexes");
-                    for (int it = index + 1; it < currentSelection.Count; ++it)
+                    for (int it = index + 1; it < currentSelection.Count; ++it) {
                         currentSelection[it].SetIsSelected(false);
+                        this.isDrag = false;
+                    }
                     currentSelection
                         .RemoveRange(index + 1, currentSelection.Count - index - 1);
                 }
                 else {
                     currentSelection.Add(alphabet);
                     alphabet.SetIsSelected(true);
+                    this.isDrag = true;
                 }
                 string currentText = "";
                 foreach (Alphabet alp in currentSelection)
@@ -114,11 +119,12 @@ public class MenuController : MonoBehaviour
         inGameMenu.SetActive(true);
     }
 
-    public void OnUpdateScoreClicked()
+    public void onSubmitClicked()
     {
+        Debug.Log("in on submit clicked");
         List<int> idlist = new List<int>();
         currentSelection.ForEach(alphabet => idlist.Add(alphabet.id));
-        GameController.Instance.UpdateScore(selection.text, idlist);
+        GameController.Instance.UpdateScore(selection.text, idlist, isDrag);
     }
 
     internal void DestroySelection()
@@ -136,6 +142,10 @@ public class MenuController : MonoBehaviour
         for (int i = 0; i < currentSelection.Count; ++i)
             currentSelection[i].SetIsSelected(false);
         currentSelection.Clear();
+    }
+
+    internal void submitSelection() {
+        
     }
 
     private void OnDestroy()

@@ -71,16 +71,17 @@ public class NetworkController : MonoBehaviour
         string ch = (e.data["char"].ToString());
         Debug.Log("Players are online, Starting new game from " + position + "," + ch[1]);
         GameController.Instance.StartGame(1);
-        GameController.Instance.CreateAlphabet(position, ch[1], id);
+        GameController.Instance.CreateAlphabet(position, ch[1], id, false);
     }
 
     private void OnSpawnAlphabet(SocketIOEvent e) {
         Debug.Log(e.data["x"].ToString() + e.data["char"].ToString());
         int id = int.Parse(e.data["id"].ToString()); 
         int x = int.Parse(e.data["x"].ToString());
+        bool isSpecial = bool.Parse(e.data["isSpecial"].ToString());
         Vector3 position = new Vector3(x, 5, 0);
         string ch = (e.data["char"].ToString());
-        GameController.Instance.CreateAlphabet(position, ch[1], id);
+        GameController.Instance.CreateAlphabet(position, ch[1], id, isSpecial);
     }
 
     private void OnInit(SocketIOEvent e)
@@ -107,6 +108,22 @@ public class NetworkController : MonoBehaviour
         jsonArray += "]";
         string jsonString = string.Format(@"{{ ""word"" : ""{0}"" , ""idList"" : ""{1}""}}", word, jsonArray);
         socket.Emit("wordSelected", new JSONObject(jsonString));
+    }
+
+    public void submitSelection(string word, List<Tuple<int, bool>> idList, bool isDrag)
+    {
+        string jsonArray = "[";
+        for (int i = 0; i < idList.Count; ++i)
+        {
+            jsonArray += "{";
+            jsonArray += ("id:" + idList[i].Item1 + "," + "special:"+idList[i].Item2);
+            jsonArray += "}";
+            if (i < idList.Count - 1)
+                jsonArray += ",";
+        }
+        jsonArray += "]";
+        string jsonString = string.Format(@"{{ ""word"" : ""{0}"" , ""idList"" : ""{1}"", ""isDrag"" : ""{2}""}}", word, jsonArray, isDrag);
+        socket.Emit("submitSelection", new JSONObject(jsonString));
     }
 
     private void OnUpdateScore(SocketIOEvent e) {

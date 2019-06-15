@@ -14,6 +14,8 @@ public class Alphabet : MonoBehaviour
     private bool isSelected;
     private AudioSource audioSource;
 
+    private bool special;
+
     private void Start()
     {
         naturalColor = GetComponent<MeshRenderer>().material.color;
@@ -41,6 +43,18 @@ public class Alphabet : MonoBehaviour
     public void Explode(float time = 0.1f)
     {
         GetComponent<Destructible>().Explode(time);
+    }
+
+    public void makeSpecial(Material material) {
+        GetComponent<MeshRenderer>().material = material;
+        this.special = true;
+    }
+    public void replaceMaterial(Material material) {
+        GetComponent<MeshRenderer>().material = material;
+    }
+
+    public bool isSpecial() {
+        return this.special;
     }
 
     public bool GetIsSelected() { return isSelected; }

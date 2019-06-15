@@ -16,13 +16,14 @@ public class GameController : MonoBehaviour
     public Mode currentGameMode;
     public GameObject dummyObject;
     public GameObject alphabetPrefab;
-    public GameObject specialAlphaPrefab;
     
     public Dictionary<int, GameObject> alphabets;
     public int ROWS = 4;
     public float WIDTH = 10;
     public int SCORE = 0;
     public int SPAWN_RATE = 2;
+
+    public Material specialMaterial;
 
     private float SCALE = 1;
     private List<Alphabet> currentSelection;
@@ -50,6 +51,7 @@ public class GameController : MonoBehaviour
         switch (currentGameMode) {
             case Mode.LOCAL: 
                 //Keep instantiating new aplhabets
+                NetworkController.Instance.RequestConnection();
                 InvokeRepeating("SpawnAlphabetLocal", 2.0f, SPAWN_RATE);
                 break;
             case Mode.MULTIPLAYER:
@@ -88,24 +90,36 @@ public class GameController : MonoBehaviour
         int x = (int) (Random.Range(0, ROWS) * SCALE);
         Vector3 position = new Vector3(x , 5, 0);
         char character = (char)(Random.Range(0, 26) + 65);
-        CreateAlphabet(position, character, Random.Range(0,100));
+        bool isSpecial = Random.Range(0, 10) == 1;
+        CreateAlphabet(position, character, Random.Range(0,100), isSpecial);
     }
 
-    public void CreateAlphabet(Vector3 position, char character, int id) {
+    public void CreateAlphabet(Vector3 position, char character, int id, bool isSpecial) {
         GameObject alphabet = Instantiate(alphabetPrefab, position, Quaternion.identity);
         alphabet.name = character + "_" + id.ToString();
         alphabet.transform.localScale = Vector3.one * SCALE;
         alphabet.GetComponent<Alphabet>().id = id;
         alphabet.GetComponent<Alphabet>().character = character;
         alphabets[id] = alphabet;
+        if(isSpecial) {
+            alphabet.GetComponent<Alphabet>().makeSpecial(specialMaterial);
+        }
     }
 
-    public void UpdateScore(string word, List<int> idList)
+    public void UpdateScore(string word, List<int> idList, bool isDrag)
     {
         if (currentGameMode == Mode.LOCAL) {
-            StartCoroutine(NetworkController.Instance.GetRequest(word, UpdateScore));
+            NetworkController.Instance.submitSelection(word, getLetterList(idList), isDrag);
         }
         else NetworkController.Instance.OnWordSelected(word, idList);
+    }
+
+    private List<Tuple<int, bool>> getLetterList(List<int> idList) {
+        var list = new List<Tuple<int, bool>>();
+        foreach(int id in idList) {
+            list.Add(Tuple.Create(id, alphabets[id].GetComponent<Alphabet>().isSpecial()));
+        }
+        return list;
     }
 
     public void UpdateScore(int scoreDelta) {
@@ -121,6 +135,10 @@ public class GameController : MonoBehaviour
         foreach(int id in list) {
             alphabets[id].GetComponent<Alphabet>().Explode();
         }
+    }
+
+    public void resetSelection() {
+        MenuController.Instance.UnSelectAll();
     }
     
     public void Quit()
