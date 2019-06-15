@@ -79,6 +79,10 @@ public class GameController : MonoBehaviour
         }
     }
 
+    public void playerReady() {
+        MenuController.Instance.DisableWaitingForPlayersMenu();
+    }
+
     public void SetState(GameState nextState)
     {
         Instance.currentState = nextState;

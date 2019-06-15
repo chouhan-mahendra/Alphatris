@@ -44,6 +44,7 @@ public class OnDragExample : MonoBehaviour
                 Alphabet alphabet = hitObject.GetComponent<Alphabet>();
                 Debug.Log("onDragged select " + alphabet.character);
                 alphabet.SetIsSelected(true);
+                MenuController.Instance.setDrag(true);
             }
         }
     }

@@ -44,6 +44,14 @@ public class MenuController : MonoBehaviour
                 break;
         }
 
+        if(Input.touchCount > 0) {
+            Debug.Log(Input.touchCount);
+        }
+
+        if(Input.touchCount == 2) {
+            this.onSubmitClicked();
+        }
+
         if(Input.GetKeyDown(KeyCode.Escape)) {
             if (state == GameController.GameState.PAUSED)
             {
@@ -75,7 +83,6 @@ public class MenuController : MonoBehaviour
                     //Debug.Log("item already present, removing all proceeding indexes");
                     for (int it = index + 1; it < currentSelection.Count; ++it) {
                         currentSelection[it].SetIsSelected(false);
-                        this.isDrag = false;
                     }
                     currentSelection
                         .RemoveRange(index + 1, currentSelection.Count - index - 1);
@@ -83,7 +90,7 @@ public class MenuController : MonoBehaviour
                 else {
                     currentSelection.Add(alphabet);
                     alphabet.SetIsSelected(true);
-                    this.isDrag = true;
+                    this.isDrag = false;
                 }
                 string currentText = "";
                 foreach (Alphabet alp in currentSelection)
@@ -97,6 +104,10 @@ public class MenuController : MonoBehaviour
         pauseMenu.SetActive(true);
         GameController.Instance.SetState(GameController.GameState.PAUSED);
         Time.timeScale = 0f;
+    }
+
+    public void setDrag(bool isDrag) {
+        this.isDrag = isDrag;
     }
 
     public void Resume()
@@ -135,7 +146,7 @@ public class MenuController : MonoBehaviour
         currentSelection.Clear();
     }
 
-    internal void UnSelectAll()
+    public void UnSelectAll()
     {
         selection.text = "";
         for (int i = 0; i < currentSelection.Count; ++i)

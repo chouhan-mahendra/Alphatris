@@ -9,7 +9,7 @@ using SimpleJSON;
 public class NetworkController : MonoBehaviour
 {
     public static NetworkController Instance;
-    public string URL_Http = "http://localhost:8080/check";
+    public string URL_Http = "http://172.16.0.222:8080/check";
 
     private void Awake()
     {
@@ -30,12 +30,13 @@ public class NetworkController : MonoBehaviour
         socket.On("open",OnConnected);
         socket.On("init", OnInit);
         socket.On("startGame", OnStartGame);
-        socket.On("playerConnected", OnPlayerConnected);
         socket.On("playerDisconnected", OnPlayerDisconnected);
         socket.On("spawnAlphabet", OnSpawnAlphabet);
         socket.On("updateScore", OnUpdateScore);
         socket.On("destroyAlphabet", OnDestroyAlphabet);
         socket.On("multiplayerConnectionEstablished", multiplayerConnectionEstablished);
+        socket.On("invalidSelection", invalidSelection);
+        socket.On("playerReady", playerReady);
 
         //var array2 = JSON.Parse("[1,2,3]");
         //var array3 = JSON.Parse("\"[1,2,3]\"".Replace("\"",""));
@@ -59,11 +60,8 @@ public class NetworkController : MonoBehaviour
         Debug.Log("Player disconnected {" + e.data["id"] + ","+ e.data["name"] + "}");
     }
 
-    private void OnPlayerConnected(SocketIOEvent e)
-    {
-        string id = e.data["id"].ToString();
-        string name = e.data["name"].ToString();
-        Debug.Log("Player connected {"+ id +"," + name + "}");
+    private void playerReady(SocketIOEvent e) {
+        GameController.Instance.playerReady();
     }
 
     private void OnStartGame(SocketIOEvent e)
@@ -103,10 +101,12 @@ public class NetworkController : MonoBehaviour
         string multiId = "";
         if(id1 == this.id) {
             multiId = id2;
-        } else {
+        } else if(id2 == this.id){
             multiId = id1;
         }
-        GameController.Instance.chooseMultiplayerId(multiId);
+        if(multiId != "") {
+            GameController.Instance.chooseMultiplayerId(multiId);
+        }
     }
 
     public void addToPool() {
@@ -154,6 +154,10 @@ public class NetworkController : MonoBehaviour
         
         Debug.Log("onDestroyAlphabet : " + array[0] + "," + array.Count);
         GameController.Instance.DestroyAlphabet(list);
+    }
+
+    private void invalidSelection(SocketIOEvent e) {
+        MenuController.Instance.UnSelectAll();
     }
 
     public string getParsedResponse(string s) {

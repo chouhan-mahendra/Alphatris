@@ -10,11 +10,9 @@ const app = express();
 
 const socketIo = require("socket.io")(PORT_WEBSOCKET);
 const utils = require("./utils.js");
-const spellchecker = require("spellchecker");
 const checkword = require("check-word")("en");
 const { interval } = require('rxjs');
 const { map, skip, take } = require('rxjs/operators');
-const redis = require('redis');
 
 const GameActions = {
     init : "init",
@@ -28,7 +26,9 @@ const GameActions = {
     submitSelection: "submitSelection",
     addToPool: "addToPool",
     establishMultiplayerConnection: "establishMultiplayerConnection",
-    multiplayerConnectionEstablished: "multiplayerConnectionEstablished"
+    multiplayerConnectionEstablished: "multiplayerConnectionEstablished",
+    invalidSelection: "invalidSelection",
+    playerReady: "playerReady"
 };
 
 app.get('/check', (req,res) => {
@@ -45,58 +45,25 @@ var multiAvailable = [];
 console.log(`websocket server starting on {${PORT_WEBSOCKET}}`);
 
 const MIN_PLAYER_COUNT = 2;
-const state = {};
 let subscription = undefined;
 
 socketIo.on("connection", socket => {
-
-    if (Object.keys(state).length == MIN_PLAYER_COUNT) {
-        socket.close();
-        return;
-    }
 
     const data = { 
                     id : utils.getRandomID(), 
                     name : utils.getRandomName(),
                     socket 
                 };
-    players[data.id] = {"name": data.name};
+    players[data.id] = data;
 
     console.log(`client connected [${data.id} , ${data.name}]`);
-    //for previous players
-    socket.broadcast.emit(GameActions.playerConnected, { id : data.id, name : data.name });
-    //for current player
+    
+
     var multiId = "-1";
     if(multiAvailable.length != 0) {
         multiId = multiAvailable[0];
     }
     socket.emit(GameActions.init, { id : data.id, name : data.name, multiplayer_id: multiId });
-
-    //simulate player connections for current player
-    Object.keys(state).forEach(item => socket.emit(GameActions.playerConnected, { id : item.id, name : item.name }));
-    state[data.id] = data;
-
-    if(Object.keys(state).length == MIN_PLAYER_COUNT) {
-        const event = { id : 0, x : 2, char : 'Z' };
-        console.log(`all players are ready, starting game with ${JSON.stringify(event)}`)
-        Object.keys(state).forEach(player => {
-            console.log(`starting game for ${player}, ${state[player].name}`);
-            state[player].socket.emit(GameActions.startGame, event);
-        });
-
-        subscription = interval(3000).subscribe(counter => {
-            const alphabet = {
-                id : counter + 1,
-                x : Math.floor(Math.random() * 5), 
-                char : utils.getRandomChar(),
-                isSpecial: utils.isSpecial()
-            };
-            Object.keys(state).forEach(player => {
-                console.log(`sending ${JSON.stringify(alphabet)} to ${state[player].name}`);
-                state[player].socket.emit(GameActions.spawnAlphabet, alphabet);
-            });
-        });
-    }
 
     socket.on(GameActions.addToPool, (event) => {
         const {id} = event;
@@ -111,11 +78,26 @@ socketIo.on("connection", socket => {
         players[multiplayerId].playing = data.id;
         players[data.id].playing = multiplayerId;
         socket.emit(GameActions.multiplayerConnectionEstablished, {id1: data.id, id2: multiplayerId});
+        players[multiplayerId].socket.emit(GameActions.playerReady);
+
+        players[data.id].socket.emit(GameActions.startGame);
+        players[multiplayerId].socket.emit(GameActions.startGame);
+
+        subscription = interval(3000).subscribe(counter => {
+            const alphabet = {
+                id : counter + 1,
+                x : Math.floor(Math.random() * 5), 
+                char : utils.getRandomChar(),
+                isSpecial: utils.isSpecial()
+            };
+            players[data.id].socket.emit(GameActions.spawnAlphabet, alphabet);
+            players[multiplayerId].socket.emit(GameActions.spawnAlphabet, alphabet);
+        });
     })
 
     socket.on(GameActions.submitSelection, (event) => {
         const { word , alphabetList, isDrag } = event;
-        console.log(`${data.name} selected ${event.word}, ${alphabetList} [${spellchecker.isMisspelled(event.word)}], ${isDrag}`);
+        console.log(`${data.name} selected ${event.word}, ${alphabetList} [${checkword.check(event.word.toLowerCase())}], ${isDrag}`);
 
         const score = getScore(word, alphabetList, isDrag);
         let idList = [];
@@ -125,19 +107,20 @@ socketIo.on("connection", socket => {
         if(score > 0) {
             socket.emit(GameActions.destroyAlphabet, { idList });
             socket.emit(GameActions.updateScore, {score});
+        } else {
+            socket.emit(GameActions.invalidSelection);
         }
     });
 
     var getScore = (word, alphabetList, isDrag) => {
-        if (spellchecker.isMisspelled(word) || word.length < 2) {
-            return 0;
+        if (checkword.check(word.toLowerCase()) && word.length > 2) {
+            return word.length;
         }
-        return word.length;
+        return 0;
     }
 
     socket.on("disconnect", () => {
         console.log(`client ${data.id} disconnected!!`);
-        delete state[data.id];
         socket.broadcast.emit(GameActions.playerDisconnected, { id : data.id, name : data.name });
         delete players[data.id];
         var ind = multiAvailable.map(function(e) { return e; }).indexOf(data.id);
