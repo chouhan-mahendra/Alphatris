@@ -37,6 +37,7 @@ public class NetworkController : MonoBehaviour
         socket.On("multiplayerConnectionEstablished", multiplayerConnectionEstablished);
         socket.On("invalidSelection", invalidSelection);
         socket.On("playerReady", playerReady);
+        socket.On("checkAndDestroyAlphabet", checkAndDestroyAlphabet);
 
         //var array2 = JSON.Parse("[1,2,3]");
         //var array3 = JSON.Parse("\"[1,2,3]\"".Replace("\"",""));
@@ -154,6 +155,19 @@ public class NetworkController : MonoBehaviour
         
         Debug.Log("onDestroyAlphabet : " + array[0] + "," + array.Count);
         GameController.Instance.DestroyAlphabet(list);
+    }
+
+    private void checkAndDestroyAlphabet(SocketIOEvent e) {
+        Debug.Log("onCheckAndDestroyAlphabet : " + e.data["idList"].ToString());
+
+        var array = JSON.Parse(e.data["idList"].ToString().Replace("\"", ""));
+
+        List<int> list = new List<int>();
+        for (int i = 0; i < array.Count; ++i)
+            list.Add(array[i]);
+        
+        Debug.Log("onDestroyAlphabet : " + array[0] + "," + array.Count);
+        GameController.Instance.checkAndDestroyAlphabet(list);
     }
 
     private void invalidSelection(SocketIOEvent e) {

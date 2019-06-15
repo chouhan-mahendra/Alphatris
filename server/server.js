@@ -28,7 +28,8 @@ const GameActions = {
     establishMultiplayerConnection: "establishMultiplayerConnection",
     multiplayerConnectionEstablished: "multiplayerConnectionEstablished",
     invalidSelection: "invalidSelection",
-    playerReady: "playerReady"
+    playerReady: "playerReady",
+    checkAndDestroyAlphabet: "checkAndDestroyAlphabet"
 };
 
 app.get('/check', (req,res) => {
@@ -107,6 +108,10 @@ socketIo.on("connection", socket => {
         if(score > 0) {
             socket.emit(GameActions.destroyAlphabet, { idList });
             socket.emit(GameActions.updateScore, {score});
+            var currPlayer = players[data.id];
+            if(currPlayer.hasOwnProperty("playing")) {
+                players[currPlayer["playing"]].socket.emit(GameActions.checkAndDestroyAlphabet, {idList});
+            }
         } else {
             socket.emit(GameActions.invalidSelection);
         }

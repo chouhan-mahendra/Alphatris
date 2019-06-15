@@ -154,10 +154,6 @@ public class MenuController : MonoBehaviour
         currentSelection.Clear();
     }
 
-    internal void submitSelection() {
-        
-    }
-
     private void OnDestroy()
     {
         clickSub.Dispose();

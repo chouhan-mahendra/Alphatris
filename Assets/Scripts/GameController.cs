@@ -117,9 +117,7 @@ public class GameController : MonoBehaviour
 
     public void UpdateScore(string word, List<int> idList, bool isDrag)
     {
-        if (currentGameMode == Mode.LOCAL) {
-            NetworkController.Instance.submitSelection(word, getLetterList(idList), isDrag);
-        }
+        NetworkController.Instance.submitSelection(word, getLetterList(idList), isDrag);
         // else NetworkController.Instance.OnWordSelected(word, idList);
     }
 
@@ -143,6 +141,21 @@ public class GameController : MonoBehaviour
     public void DestroyAlphabet(List<int> list) {
         foreach(int id in list) {
             alphabets[id].GetComponent<Alphabet>().Explode();
+        }
+    }
+
+    public void checkAndDestroyAlphabet(List<int> list) {
+        bool flag = false;
+        List<int> idlist = new List<int>();
+        currentSelection.ForEach(alphabet => idlist.Add(alphabet.id));
+        foreach(int id in list) {
+            if(idlist.Contains(id)) {
+                flag = true;
+            }
+            alphabets[id].GetComponent<Alphabet>().Explode();
+        }
+        if(flag) {
+            MenuController.Instance.UnSelectAll();
         }
     }
 
