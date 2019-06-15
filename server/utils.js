@@ -36,4 +36,4 @@ function isSpecial() {
   return (Math.floor(Math.random() * (10 - 1)) + 1) == 1;
 }
 
-module.exports = { getRandomName : haiku, getRandomID : randomID , getRandomChar : randomChar };
+module.exports = { getRandomName : haiku, getRandomID : randomID , getRandomChar : randomChar, isSpecial };

@@ -36,7 +36,6 @@ public class NetworkController : MonoBehaviour
         socket.On("spawnAlphabet", OnSpawnAlphabet);
         socket.On("updateScore", OnUpdateScore);
         socket.On("destroyAlphabet", OnDestroyAlphabet);
-
     }
 
     //TODO : write reconnection logic

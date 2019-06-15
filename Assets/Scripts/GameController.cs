@@ -50,8 +50,8 @@ public class GameController : MonoBehaviour
         SCALE = WIDTH / ROWS;
         switch (currentGameMode) {
             case Mode.LOCAL: 
+                //NetworkController.Instance.RequestConnection();
                 //Keep instantiating new aplhabets
-                NetworkController.Instance.RequestConnection();
                 InvokeRepeating("SpawnAlphabetLocal", 2.0f, SPAWN_RATE);
                 break;
             case Mode.MULTIPLAYER:

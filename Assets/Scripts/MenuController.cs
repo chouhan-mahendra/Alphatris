@@ -40,7 +40,7 @@ public class MenuController : MonoBehaviour
         GameController.GameState state = GameController.Instance.GetState();
         switch(state) {
             case GameController.GameState.STARTED:
-                score.SetText("SCORE " + GameController.Instance.SCORE);
+                score.SetText(GameController.Instance.SCORE.ToString());
                 break;
         }
 
