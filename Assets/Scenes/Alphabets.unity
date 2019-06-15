@@ -182,6 +182,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[1]
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 5540931412888914472, guid: ab387b4d30a514053b6a9043917639f1,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1920710176688670556, guid: ab387b4d30a514053b6a9043917639f1,
         type: 3}
       propertyPath: m_Delegates.Array.size
@@ -228,10 +233,19 @@ PrefabInstance:
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 978820440, guid: ab387b4d30a514053b6a9043917639f1, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 978820445, guid: ab387b4d30a514053b6a9043917639f1, type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 978820444, guid: ab387b4d30a514053b6a9043917639f1, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 21367024338892462, guid: ab02271a2064f4fb691a82ed1f26bf53,
+        type: 2}
     - target: {fileID: 978820442, guid: ab387b4d30a514053b6a9043917639f1, type: 3}
       propertyPath: m_havePropertiesChanged
       value: 1

@@ -35,6 +35,7 @@ public class NetworkController : MonoBehaviour
         socket.On("spawnAlphabet", OnSpawnAlphabet);
         socket.On("updateScore", OnUpdateScore);
         socket.On("destroyAlphabet", OnDestroyAlphabet);
+        socket.On("multiplayerConnectionEstablished", multiplayerConnectionEstablished);
 
         //var array2 = JSON.Parse("[1,2,3]");
         //var array3 = JSON.Parse("\"[1,2,3]\"".Replace("\"",""));
@@ -89,28 +90,36 @@ public class NetworkController : MonoBehaviour
 
     private void OnInit(SocketIOEvent e)
     {
-        id = e.data["id"].ToString();
-        playerName = e.data["name"].ToString();
+        id = this.getParsedResponse(e.data["id"].ToString());
+        playerName = this.getParsedResponse(e.data["name"].ToString());
+        string multiplayerId = this.getParsedResponse(e.data["multiplayer_id"].ToString().Replace("\\", ""));
+        GameController.Instance.chooseMultiplayerId(multiplayerId);
         Debug.Log("Init {" + id + "," + playerName + "}");
+    }
+
+    private void multiplayerConnectionEstablished(SocketIOEvent e) {
+        string id1 = this.getParsedResponse(e.data["id1"].ToString());
+        string id2 = this.getParsedResponse(e.data["id2"].ToString());
+        string multiId = "";
+        if(id1 == this.id) {
+            multiId = id2;
+        } else {
+            multiId = id1;
+        }
+        GameController.Instance.chooseMultiplayerId(multiId);
+    }
+
+    public void addToPool() {
+        socket.Emit("addToPool", new JSONObject(string.Format(@"{{ ""id"" : ""{0}""}}", this.id)));
+    }
+
+    public void establishMultiplayerConnection(string multiplayerId) {
+        socket.Emit("establishMultiplayerConnection", new JSONObject(string.Format(@"{{ ""multiplayerId"" : ""{0}""}}", multiplayerId)));
     }
 
     private void OnConnected(SocketIOEvent obj)
     {
         Debug.Log("connected to server");
-    }
-
-    public void OnWordSelected(string word, List<int> idList)
-    {
-        string jsonArray = "[";
-        for (int i = 0; i < idList.Count; ++i)
-        {
-            jsonArray += idList[i];
-            if (i < idList.Count - 1)
-                jsonArray += ",";
-        }
-        jsonArray += "]";
-        string jsonString = string.Format(@"{{ ""word"" : ""{0}"" , ""idList"" : ""{1}""}}", word, jsonArray);
-        socket.Emit("wordSelected", new JSONObject(jsonString));
     }
 
     public void submitSelection(string word, List<Tuple<int, bool>> idList, bool isDrag)
@@ -145,6 +154,10 @@ public class NetworkController : MonoBehaviour
         
         Debug.Log("onDestroyAlphabet : " + array[0] + "," + array.Count);
         GameController.Instance.DestroyAlphabet(list);
+    }
+
+    public string getParsedResponse(string s) {
+        return s.Replace('"', ' ').Trim();
     }
 
     public IEnumerator GetRequest(string word, System.Action<int> done) {

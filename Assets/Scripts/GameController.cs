@@ -9,7 +9,7 @@ using Random = UnityEngine.Random;
 public class GameController : MonoBehaviour
 {
     public static GameController Instance;
-    public enum GameState { STARTED, PAUSED, IN_LOBBY }
+    public enum GameState { STARTED, PAUSED, IN_LOBBY, WAITING_FOR_PLAYERS }
     public enum Mode { LOCAL, MULTIPLAYER }
 
     public GameState currentState;
@@ -21,7 +21,7 @@ public class GameController : MonoBehaviour
     public int ROWS = 4;
     public float WIDTH = 10;
     public int SCORE = 0;
-    public int SPAWN_RATE = 2;
+    public float SPAWN_RATE;
 
     public Material specialMaterial;
 
@@ -38,24 +38,21 @@ public class GameController : MonoBehaviour
         currentState = GameState.IN_LOBBY;
     }
 
-    public void RequestConnection() {
-        NetworkController.Instance.RequestConnection();
-    }
-
     public void StartGame(int mode)
     {
         currentGameMode = (Mode)mode;
-        currentState = GameState.STARTED;
         Time.timeScale = 1f;
         SCALE = WIDTH / ROWS;
         switch (currentGameMode) {
             case Mode.LOCAL: 
                 //Keep instantiating new aplhabets
+                currentState = GameState.STARTED;
                 NetworkController.Instance.RequestConnection();
-                InvokeRepeating("SpawnAlphabetLocal", 2.0f, SPAWN_RATE);
+                InvokeRepeating("SpawnAlphabetLocal", 1.0f, SPAWN_RATE);
                 break;
             case Mode.MULTIPLAYER:
-                MenuController.Instance.DisableWaitingForPlayersMenu();
+                currentState = GameState.WAITING_FOR_PLAYERS;
+                NetworkController.Instance.RequestConnection();
                 break;
         }
 
@@ -68,6 +65,20 @@ public class GameController : MonoBehaviour
         currentSelection = new List<Alphabet>();
     }
 
+    public void chooseMultiplayerId(string multiplayerId) {
+        if(currentGameMode == Mode.MULTIPLAYER && currentState == GameState.WAITING_FOR_PLAYERS) {
+            Debug.Log(multiplayerId);
+            Debug.Log(multiplayerId.Length);
+            if(multiplayerId != "-1") {
+                currentState = GameState.STARTED;
+                MenuController.Instance.DisableWaitingForPlayersMenu();
+                NetworkController.Instance.establishMultiplayerConnection(multiplayerId);
+            } else {
+                NetworkController.Instance.addToPool();
+            }
+        }
+    }
+
     public void SetState(GameState nextState)
     {
         Instance.currentState = nextState;
@@ -75,7 +86,6 @@ public class GameController : MonoBehaviour
 
     public void EndGame()
     {
-        Debug.Log("********EndGame********");
         Time.timeScale = 0f;
         MenuController.Instance.EndGame(SCORE);
     }
@@ -106,7 +116,7 @@ public class GameController : MonoBehaviour
         if (currentGameMode == Mode.LOCAL) {
             NetworkController.Instance.submitSelection(word, getLetterList(idList), isDrag);
         }
-        else NetworkController.Instance.OnWordSelected(word, idList);
+        // else NetworkController.Instance.OnWordSelected(word, idList);
     }
 
     private List<Tuple<int, bool>> getLetterList(List<int> idList) {
