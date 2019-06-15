@@ -9,9 +9,10 @@ public class Alphabet : MonoBehaviour
     public char character;
     public Color onSelectColor;
     public int id;
-
+    public static float AudioPitch = 0.8f;
     private Color naturalColor;
     private bool isSelected;
+    private AudioSource audioSource;
 
     private bool special;
 
@@ -19,6 +20,7 @@ public class Alphabet : MonoBehaviour
     {
         naturalColor = GetComponent<MeshRenderer>().material.color;
         isSelected = false;
+        audioSource = GetComponent<AudioSource>();
         foreach (Transform child in transform)
         {
             TextMeshPro text = child.gameObject.GetComponent<TextMeshPro>();
@@ -33,6 +35,9 @@ public class Alphabet : MonoBehaviour
         this.isSelected = isSelected;
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         meshRenderer.material.color = isSelected ? onSelectColor : naturalColor;
+        AudioPitch += (isSelected) ? 0.1f : -0.1f;
+        audioSource.pitch = AudioPitch;
+        audioSource.Play();
     }
 
     public void Explode(float time = 0.1f)

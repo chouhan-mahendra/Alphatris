@@ -80,6 +80,11 @@ public class GameController : MonoBehaviour
         MenuController.Instance.EndGame(SCORE);
     }
 
+    public void LoadMenu()
+    {
+        SceneManager.LoadScene("LobbyScene");
+    }
+
     void SpawnAlphabetLocal()
     {
         int x = (int) (Random.Range(0, ROWS) * SCALE);
