@@ -233,6 +233,10 @@ PrefabInstance:
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 978820441, guid: ab387b4d30a514053b6a9043917639f1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 978820440, guid: ab387b4d30a514053b6a9043917639f1, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1
