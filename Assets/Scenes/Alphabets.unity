@@ -176,7 +176,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: cb3262187eb1ac64cb9b6829246f7907, type: 2}
+      objectReference: {fileID: 2100000, guid: ef68d2300b67843e0a234deb5e84e92d, type: 2}
     - target: {fileID: 6438092709709093976, guid: ab387b4d30a514053b6a9043917639f1,
         type: 3}
       propertyPath: m_Materials.Array.data[1]
@@ -235,7 +235,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 978820441, guid: ab387b4d30a514053b6a9043917639f1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1
+      value: -0.6
       objectReference: {fileID: 0}
     - target: {fileID: 978820440, guid: ab387b4d30a514053b6a9043917639f1, type: 3}
       propertyPath: m_StaticEditorFlags
