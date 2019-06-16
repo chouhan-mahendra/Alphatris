@@ -15,6 +15,7 @@ public class Destructible : MonoBehaviour
     private IEnumerator Destroy(float time)
     {
         yield return new WaitForSeconds(time);
+        if (gameObject == null) yield break;
         GameObject destroyEffectInst = Instantiate(onDestroyEffect, transform.position, Quaternion.identity);
         Collider[] colliders = Physics.OverlapSphere(transform.position, 1);
         foreach (Collider nearby in colliders)
@@ -22,7 +23,7 @@ public class Destructible : MonoBehaviour
             Rigidbody rb = nearby.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.AddExplosionForce(200, transform.position, 4);
+                rb.AddExplosionForce(100, transform.position, 4);
             }
         }
         Destroy(this.gameObject);

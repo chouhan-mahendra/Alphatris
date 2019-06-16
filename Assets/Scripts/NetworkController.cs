@@ -117,7 +117,7 @@ public class NetworkController : MonoBehaviour
         string multiId = "";
         if(id1 == this.id) {
             multiId = id2;
-        } else if(id2 == this.id){
+        } else if(id2 == this.id) {
             multiId = id1;
         }
         if(multiId != "") {
@@ -143,10 +143,9 @@ public class NetworkController : MonoBehaviour
         Debug.Log("connected to server");
     }
 
-    public void submitSelection(string word, List<Tuple<int, int>> idList, bool isDrag)
+    public void submitSelection(string word, List<Tuple<int, int>> idList, bool isDrag, int specialPointsCount = 0)
     {
         string jsonArray = "[";
-        int specialPointsCount = 0;
         int specialTimeCount = 0;
         for (int i = 0; i < idList.Count; ++i)
         {

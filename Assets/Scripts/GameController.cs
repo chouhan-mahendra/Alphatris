@@ -144,8 +144,20 @@ public class GameController : MonoBehaviour
 
     public void UpdateScore(string word, List<int> idList, bool isDrag)
     {
-        NetworkController.Instance.submitSelection(word, getLetterList(idList), isDrag);
+        NetworkController.Instance.submitSelection(word, getLetterList(idList), isDrag, getExplosionCount(idList));
         // else NetworkController.Instance.OnWordSelected(word, idList);
+    }
+
+    private int getExplosionCount(List<int> idList)
+    {
+        int explosionCount = 0;
+        foreach(int id in idList) {
+            var type = alphabets[id].GetComponent<Alphabet>().alphabetType;
+            if(type == Alphabet.TYPE.BOMBERMAN) {
+                explosionCount += 2;
+            }
+        }
+        return explosionCount;
     }
 
     private List<Tuple<int, int>> getLetterList(List<int> idList) {
@@ -174,10 +186,12 @@ public class GameController : MonoBehaviour
     }
 
     public void checkAndDestroyAlphabet(List<int> list) {
+   
         bool flag = false;
         List<int> idlist = new List<int>();
         currentSelection.ForEach(alphabet => idlist.Add(alphabet.id));
         foreach(int id in list) {
+            //something destroyed from current selection, unselect it
             if(idlist.Contains(id)) {
                 flag = true;
             }

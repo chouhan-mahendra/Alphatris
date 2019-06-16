@@ -16,8 +16,9 @@ public class Alphabet : MonoBehaviour
 
     public Material extraPointsMaterial;
     public Material timeStopMaterial;
+    public Material explosiveMaterial;
 
-    public enum TYPE {NORMAL, EXTRA_POINTS, TIME_STOP};
+    public enum TYPE {NORMAL, EXTRA_POINTS, TIME_STOP, BOMBERMAN};
     public TYPE alphabetType;
 
     private void Start()
@@ -101,6 +102,9 @@ public class Alphabet : MonoBehaviour
                 GetComponent<MeshRenderer>().material = timeStopMaterial;
                 naturalColor = timeStopMaterial.color;
                 break;
+            case TYPE.BOMBERMAN:
+                GetComponent<MeshRenderer>().material = explosiveMaterial;
+                break;
         }
     }
 
@@ -122,5 +126,20 @@ public class Alphabet : MonoBehaviour
         if(transform.position.y > 3) {
             GameController.Instance.EndGame();
         }
+    }
+
+    internal List<Alphabet> FindNeighbours()
+    {
+        List<Alphabet> neighbours = new List<Alphabet>();
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 1);
+        foreach (Collider nearby in colliders)
+        {
+            Alphabet neighbour = nearby.GetComponent<Alphabet>();
+            if (neighbour != null )
+            {
+                neighbours.Add(neighbour);
+            }
+        }
+        return neighbours;
     }
 }

@@ -143,6 +143,7 @@ MonoBehaviour:
   id: 0
   extraPointsMaterial: {fileID: 2100000, guid: 69de3b570b9444193ab4d10be7e0b6fc, type: 2}
   timeStopMaterial: {fileID: 2100000, guid: b1699a24f5093486ba80fe84128d1bfe, type: 2}
+  explosiveMaterial: {fileID: 2100000, guid: 0aae1784c2c4747ba99c485293271749, type: 2}
   alphabetType: 0
 --- !u!114 &1920710176688670556
 MonoBehaviour:
