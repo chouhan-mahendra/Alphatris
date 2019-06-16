@@ -28,7 +28,6 @@ public class MenuController : MonoBehaviour
     public TextMeshProUGUI score;
     public TextMeshProUGUI selection;
     public TextMeshProUGUI gameOverText;
-    public bool isDrag;
 
     private List<Alphabet> currentSelection = new List<Alphabet>();
     private IDisposable clickSub;
@@ -100,7 +99,6 @@ public class MenuController : MonoBehaviour
             for (int it = index + 1; it < currentSelection.Count; ++it)
             {
                 currentSelection[it].SetIsSelected(false);
-                this.isDrag = false;
             }
             currentSelection
                 .RemoveRange(index + 1, currentSelection.Count - index - 1);
@@ -124,10 +122,6 @@ public class MenuController : MonoBehaviour
         Time.timeScale = 0f;
     }
 
-    public void setDrag(bool isDrag) {
-        this.isDrag = isDrag;
-    }
-
     public void Resume()
     {
         pauseMenu.SetActive(false);
@@ -149,7 +143,7 @@ public class MenuController : MonoBehaviour
         inGameMenu.SetActive(true);
     }
 
-    public void onSubmitClicked()
+    public void onSubmitClicked(bool isDrag = false)
     {
         List<int> idlist = new List<int>();
         currentSelection.ForEach(alphabet => idlist.Add(alphabet.id));
@@ -170,11 +164,6 @@ public class MenuController : MonoBehaviour
         for (int i = 0; i < currentSelection.Count; ++i)
             currentSelection[i].SetIsSelected(false);
         currentSelection.Clear();
-    }
-
-    private void OnDestroy()
-    {
-        //clickSub.Dispose();
     }
 
     public void reset() {

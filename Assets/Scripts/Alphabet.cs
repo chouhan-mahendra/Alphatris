@@ -44,6 +44,14 @@ public class Alphabet : MonoBehaviour
         });
         //Add the trigger entry
         trigger.triggers.Add(entry);
+
+        EventTrigger.Entry endDrag = new EventTrigger.Entry();
+        endDrag.eventID = EventTriggerType.EndDrag;
+        endDrag.callback.AddListener((data) => {
+            Debug.Log("End Drag");
+            MenuController.Instance.onSubmitClicked(true);
+        });
+        trigger.triggers.Add(endDrag);
     }
 
     public void setMaterial(Material m) {
@@ -72,11 +80,9 @@ public class Alphabet : MonoBehaviour
             Debug.Log("MouseUP " + hit.transform.gameObject.name);
             if (gameObject.name.Equals(hit.transform.gameObject.name))
             {
-                MenuController.Instance.isDrag = false;
                 MenuController.Instance.OnSelectAlphabet(gameObject);
-                //SetIsSelected(!isSelected);
             }
-            else MenuController.Instance.isDrag = true;
+            //else let ondragend take care of everything
         }
     }
 
