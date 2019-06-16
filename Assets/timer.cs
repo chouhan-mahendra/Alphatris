@@ -10,9 +10,12 @@
  
      private float time;
 
-     public bool isPaused;
+     public static bool isPaused;
  
      void Update() {
+         if(isPaused) {
+             Debug.Log("Jasdeep");
+         }
          if((!(GameController.Instance.currentState == GameController.GameState.STARTED)) || isPaused) {
              return;
          }

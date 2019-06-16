@@ -65,15 +65,13 @@ public class NetworkController : MonoBehaviour
     }
 
     private void OnSpawnAlphabet(SocketIOEvent e) {
-        Debug.Log("alphabet");
         int id = int.Parse(e.data["id"].ToString()); 
         int x = int.Parse(e.data["x"].ToString());
         int type = int.Parse(e.data["type"].ToString());
-        Debug.Log("alphabet 1");
         Vector3 position = new Vector3(x, 5, 0);
         string ch = (e.data["char"].ToString());
         GameController.Instance.CreateAlphabet(position, ch[1], id, type);
-        timer.Instance.isPaused = false;
+        timer.isPaused = false;
     }
 
     private void OnInit(SocketIOEvent e)
@@ -149,7 +147,7 @@ public class NetworkController : MonoBehaviour
         GameController.Instance.UpdateScore(scoreDelta);
         if(timeToStop > 0) {
             Debug.Log("in time to stop");
-            timer.Instance.isPaused = true;
+            timer.isPaused = true;
         }
     }
 
