@@ -32,6 +32,8 @@ public class GameController : MonoBehaviour
     private float SCALE = 1;
     private List<Alphabet> currentSelection;
 
+    public GameObject alphaHolder;
+
     private void Awake()
     {
         if (Instance == null)
@@ -57,6 +59,7 @@ public class GameController : MonoBehaviour
 
     public void StartGame(int mode)
     {
+        this.alphaHolder.SetActive(true);
         currentGameMode = (Mode)mode;
         Time.timeScale = 1f;
         SCALE = WIDTH / ROWS;
@@ -109,6 +112,7 @@ public class GameController : MonoBehaviour
     {
         Time.timeScale = 0f;
         MenuController.Instance.EndGame(SCORE);
+        this.alphaHolder.SetActive(false);
     }
 
     void SpawnAlphabetLocal()
@@ -180,11 +184,6 @@ public class GameController : MonoBehaviour
 
     public void resetSelection() {
         MenuController.Instance.UnSelectAll();
-    }
-    
-    public void Quit()
-    {
-        Application.Quit();
     }
 
     public GameState GetState()

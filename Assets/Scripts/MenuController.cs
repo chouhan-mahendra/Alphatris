@@ -125,13 +125,6 @@ public class MenuController : MonoBehaviour
         inGameMenu.SetActive(false);
     }
 
-    public void reset() {
-        NetworkController.Instance.reset();
-        gameOverMenu.SetActive(false);
-        inGameMenu.SetActive(true);
-        GameController.Instance.StartGame((int)GameController.Instance.currentGameMode);
-    }
-
     public void DisableWaitingForPlayersMenu() {
         waitingForPlayersMenu.SetActive(false);
         inGameMenu.SetActive(true);
@@ -164,5 +157,29 @@ public class MenuController : MonoBehaviour
     private void OnDestroy()
     {
         clickSub.Dispose();
+    }
+
+    public void reset() {
+        GameObject[] alphabets = GameObject.FindGameObjectsWithTag("Alphabet");
+        Debug.Log(alphabets.Length);
+        foreach(GameObject item in alphabets) {
+            Destroy(item);
+        }
+        NetworkController.Instance.reset();
+        gameOverMenu.SetActive(false);
+        inGameMenu.SetActive(true);
+        GameController.Instance.StartGame((int)GameController.Instance.currentGameMode);
+    }
+
+    public void onBackPressed() {
+        Debug.Log("in back pressed");
+        GameObject[] alphabets = GameObject.FindGameObjectsWithTag("Alphabet");
+        Debug.Log(alphabets.Length);
+        foreach(GameObject item in alphabets) {
+            Destroy(item);
+        }
+        inGameMenu.SetActive(false);
+        gameOverMenu.SetActive(false);
+        startMenu.SetActive(true);
     }
 }

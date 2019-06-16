@@ -16,6 +16,6 @@
          var fraction = (time * 100) % 100;
  
          //update the label value
-         timerText.text = string.Format ("{0:00} : {1:00} : {2:000}", minutes, seconds, fraction);
+         timerText.text = string.Format ("{0:00} : {1:00}", minutes, seconds);
      }
  }
