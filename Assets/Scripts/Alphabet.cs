@@ -80,11 +80,9 @@ public class Alphabet : MonoBehaviour
             Debug.Log("MouseUP " + hit.transform.gameObject.name);
             if (gameObject.name.Equals(hit.transform.gameObject.name))
             {
-                MenuController.Instance.isDrag = false;
                 MenuController.Instance.OnSelectAlphabet(gameObject);
-                //SetIsSelected(!isSelected);
             }
-            else MenuController.Instance.isDrag = true;
+            //else let ondragend take care of everything
         }
     }
 
