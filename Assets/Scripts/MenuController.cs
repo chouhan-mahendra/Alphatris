@@ -66,6 +66,7 @@ public class MenuController : MonoBehaviour
 
     internal void OnDrag(Vector2 position)
     {
+        //Debug.Log("OnDrag[Menu]");
         dragStream.OnNext(position);
     }
 
@@ -77,7 +78,7 @@ public class MenuController : MonoBehaviour
             RaycastHit hit = new RaycastHit();
             return (Physics.Raycast(ray, out hit)) ? hit.transform.gameObject : null;
         })
-        .Where(gameObject => gameObject != null && gameObject.tag.Equals("Cube"))
+        .Where(gameObject => gameObject != null && gameObject.tag.Equals("Alphabet"))
         //.ThrottleFirst(TimeSpan.FromMilliseconds(100))
         .DistinctUntilChanged(gameObject => {
             Alphabet alp = gameObject.GetComponent<Alphabet>();
@@ -90,7 +91,7 @@ public class MenuController : MonoBehaviour
 
     internal void OnSelectAlphabet(GameObject item)    
     {
-        Debug.Log("unirx : " + item.name);
+        //Debug.Log("unirx : " + item.name);
         Alphabet alphabet = item.GetComponent<Alphabet>();
         int index = currentSelection.FindIndex(it => it.name.Equals(item.name));
         if (index != -1)

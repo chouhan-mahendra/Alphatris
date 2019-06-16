@@ -19,7 +19,6 @@ public class OnDragExample : MonoBehaviour
         entry.callback.AddListener((data) => { OnDragSelectDelgate((PointerEventData)data); });
         //Add the trigger entry
         trigger.triggers.Add(entry);
-
     }
 
     public void OnDragDelegate(PointerEventData data)
@@ -35,17 +34,18 @@ public class OnDragExample : MonoBehaviour
     public void OnDragSelectDelgate(PointerEventData data)
     {
         var ray = Camera.main.ScreenPointToRay(data.position);
-        RaycastHit hit = new RaycastHit();
-        if (Physics.Raycast(ray, out hit))
-        {
-            GameObject hitObject = hit.transform.gameObject;
-            if (hitObject.tag.Equals("Cube"))
-            {
-                Alphabet alphabet = hitObject.GetComponent<Alphabet>();
-                Debug.Log("onDragged select " + alphabet.character);
-                alphabet.SetIsSelected(true);
-                MenuController.Instance.setDrag(true);
-            }
-        }
+            Debug.Log("OnDrag Select");
+        //RaycastHit hit = new RaycastHit();
+        //if (Physics.Raycast(ray, out hit))
+        //{
+        //    GameObject hitObject = hit.transform.gameObject;
+        //    if (hitObject.tag.Equals("Cube"))
+        //    {
+        //        Alphabet alphabet = hitObject.GetComponent<Alphabet>();
+        //        Debug.Log("onDragged select " + alphabet.character);
+        //        alphabet.SetIsSelected(true);
+        //        MenuController.Instance.setDrag(true);
+        //    }
+        //}
     }
 }
