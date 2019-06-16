@@ -68,7 +68,7 @@ public class GameController : MonoBehaviour
                 //Keep instantiating new aplhabets
                 currentState = GameState.STARTED;
                 NetworkController.Instance.RequestConnection();
-                InvokeRepeating("SpawnAlphabetLocal", 1.0f, SPAWN_RATE);
+                // InvokeRepeating("SpawnAlphabetLocal", 1.0f, SPAWN_RATE);
                 break;
             case Mode.MULTIPLAYER:
                 currentState = GameState.WAITING_FOR_PLAYERS;
@@ -96,6 +96,8 @@ public class GameController : MonoBehaviour
             } else {
                 NetworkController.Instance.addToPool();
             }
+        } else if(currentGameMode == Mode.LOCAL) {
+            NetworkController.Instance.initializeSinglePlayerGame();
         }
     }
 

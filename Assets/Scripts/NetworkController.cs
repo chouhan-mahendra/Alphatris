@@ -96,6 +96,10 @@ public class NetworkController : MonoBehaviour
         Debug.Log("Init {" + id + "," + playerName + "}");
     }
 
+    public void initializeSinglePlayerGame() {
+        socket.Emit("initializeSinglePlayerGame");
+    }
+
     private void multiplayerConnectionEstablished(SocketIOEvent e) {
         string id1 = this.getParsedResponse(e.data["id1"].ToString());
         string id2 = this.getParsedResponse(e.data["id2"].ToString());

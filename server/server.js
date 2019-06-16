@@ -30,7 +30,8 @@ const GameActions = {
     invalidSelection: "invalidSelection",
     playerReady: "playerReady",
     checkAndDestroyAlphabet: "checkAndDestroyAlphabet",
-    reset: "reset"
+    reset: "reset",
+    initializeSinglePlayerGame: "initializeSinglePlayerGame"
 };
 
 app.get('/check', (req,res) => {
@@ -73,6 +74,18 @@ socketIo.on("connection", socket => {
         multiAvailable.push(id);
     });
 
+    socket.on(GameActions.initializeSinglePlayerGame, (event) => {
+        subscription = interval(3000).subscribe(counter => {
+            const alphabet = {
+                id : counter + 1,
+                x : Math.floor(Math.random() * 5), 
+                char : utils.getRandomChar(),
+                isSpecial: utils.isSpecial()
+            };
+            socket.emit(GameActions.spawnAlphabet, alphabet);
+        });
+    });
+
     socket.on(GameActions.establishMultiplayerConnection, (event) => {
         const {multiplayerId} = event;
         var mulIndex = multiAvailable.map(function(e) { return e; }).indexOf(multiplayerId);
@@ -95,7 +108,7 @@ socketIo.on("connection", socket => {
             players[data.id].socket.emit(GameActions.spawnAlphabet, alphabet);
             players[multiplayerId].socket.emit(GameActions.spawnAlphabet, alphabet);
         });
-    })
+    });
 
     socket.on(GameActions.submitSelection, (event) => {
         const { word , wordList, isDrag, specials } = event;
