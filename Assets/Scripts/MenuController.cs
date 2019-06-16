@@ -153,8 +153,18 @@ public class MenuController : MonoBehaviour
     internal void DestroySelection()
     {
         selection.text = "";
-        for (int i = 0; i < currentSelection.Count; ++i)
-            currentSelection[i].Explode(i * 0.05f);
+        HashSet<Alphabet> finalList = new HashSet<Alphabet>();
+        foreach (Alphabet alphabet in currentSelection)
+        {
+            finalList.Add(alphabet);
+            if (alphabet.alphabetType == Alphabet.TYPE.BOMBERMAN)
+                alphabet.FindNeighbours().ForEach(a => finalList.Add(a));
+        }
+        float i = 0;
+        foreach(Alphabet alphabet in finalList) {
+            alphabet.Explode(i);
+            i += 0.05f;
+        }
         currentSelection.Clear();
     }
 
