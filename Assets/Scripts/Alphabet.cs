@@ -44,6 +44,14 @@ public class Alphabet : MonoBehaviour
         });
         //Add the trigger entry
         trigger.triggers.Add(entry);
+
+        EventTrigger.Entry endDrag = new EventTrigger.Entry();
+        endDrag.eventID = EventTriggerType.EndDrag;
+        endDrag.callback.AddListener((data) => {
+            Debug.Log("End Drag");
+            MenuController.Instance.onSubmitClicked(true);
+        });
+        trigger.triggers.Add(endDrag);
     }
 
     public void setMaterial(Material m) {
