@@ -5,6 +5,7 @@ using TMPro;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class MenuController : MonoBehaviour
 {
@@ -18,7 +19,6 @@ public class MenuController : MonoBehaviour
     }
 
     public GameObject pauseMenu;
-
     public GameObject startMenu;
     public GameObject settingsMenu;
     public GameObject waitingForPlayersMenu;
@@ -28,11 +28,11 @@ public class MenuController : MonoBehaviour
     public TextMeshProUGUI score;
     public TextMeshProUGUI selection;
     public TextMeshProUGUI gameOverText;
+    public bool isDrag;
 
     private List<Alphabet> currentSelection = new List<Alphabet>();
     private IDisposable clickSub;
-
-    private bool isDrag;
+    private Subject<Vector2> dragStream = new Subject<Vector2>();
 
     // Update is called once per frame
     void Update()
@@ -64,40 +64,57 @@ public class MenuController : MonoBehaviour
         }
     }
 
+    internal void OnDrag(Vector2 position)
+    {
+        dragStream.OnNext(position);
+    }
+
     private void Start()
     {
-        clickSub = this.UpdateAsObservable()
-            .Where(_ => Input.GetMouseButton(0))
-            .Select(_ => {
-                var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit = new RaycastHit();
-                return (Physics.Raycast(ray, out hit)) ? hit.transform.gameObject : null;
-            })
-            .Where(gameObject => gameObject != null && gameObject.tag.Equals("Alphabet"))
-            .DistinctUntilChanged(gameObject => gameObject.name)
-            .Subscribe(item => {
-                //Debug.Log("unirx : " + item.name);
-                Alphabet alphabet = item.GetComponent<Alphabet>();
-                int index = currentSelection.FindIndex(it => it.name.Equals(item.name));
-                if (index != -1) {
-                    //Debug.Log("item already present, removing all proceeding indexes");
-                    for (int it = index + 1; it < currentSelection.Count; ++it) {
-                        currentSelection[it].SetIsSelected(false);
-                    }
-                    currentSelection
-                        .RemoveRange(index + 1, currentSelection.Count - index - 1);
-                }
-                else {
-                    currentSelection.Add(alphabet);
-                    alphabet.SetIsSelected(true);
-                    this.isDrag = false;
-                }
-                string currentText = "";
-                foreach (Alphabet alp in currentSelection)
-                    currentText += alp.character;
-                selection.text = currentText;
-            });
+        dragStream
+        .Select(position => {
+            var ray = Camera.main.ScreenPointToRay(position);
+            RaycastHit hit = new RaycastHit();
+            return (Physics.Raycast(ray, out hit)) ? hit.transform.gameObject : null;
+        })
+        .Where(gameObject => gameObject != null && gameObject.tag.Equals("Cube"))
+        //.ThrottleFirst(TimeSpan.FromMilliseconds(100))
+        .DistinctUntilChanged(gameObject => {
+            Alphabet alp = gameObject.GetComponent<Alphabet>();
+            string output = alp.id.ToString() + alp.GetIsSelected();
+            //Debug.Log(output);
+            return output;
+        })
+        .Subscribe(OnSelectAlphabet);
     }
+
+    internal void OnSelectAlphabet(GameObject item)    
+    {
+        Debug.Log("unirx : " + item.name);
+        Alphabet alphabet = item.GetComponent<Alphabet>();
+        int index = currentSelection.FindIndex(it => it.name.Equals(item.name));
+        if (index != -1)
+        {
+            //Debug.Log("item already present, removing all proceeding indexes");
+            for (int it = index + 1; it < currentSelection.Count; ++it)
+            {
+                currentSelection[it].SetIsSelected(false);
+                this.isDrag = false;
+            }
+            currentSelection
+                .RemoveRange(index + 1, currentSelection.Count - index - 1);
+        }
+        else
+        {
+            currentSelection.Add(alphabet);
+            alphabet.SetIsSelected(true);
+        }
+        string currentText = "";
+        foreach (Alphabet alp in currentSelection)
+            currentText += alp.character;
+        selection.text = currentText;
+    }
+
 
     public void Pause()
     {
@@ -156,7 +173,7 @@ public class MenuController : MonoBehaviour
 
     private void OnDestroy()
     {
-        clickSub.Dispose();
+        //clickSub.Dispose();
     }
 
     public void reset() {

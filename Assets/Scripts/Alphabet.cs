@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Alphabet : MonoBehaviour
 {
@@ -29,6 +30,20 @@ public class Alphabet : MonoBehaviour
                 text.SetText(character.ToString());
             else Debug.Log("TextMeshPro not found");
         }
+
+        //Fetch the Event Trigger component from your GameObject
+        EventTrigger trigger = GetComponent<EventTrigger>();
+        //Create a new entry for the Event Trigger
+        EventTrigger.Entry entry = new EventTrigger.Entry();
+        //Add a Drag type event to the Event Trigger
+        entry.eventID = EventTriggerType.Drag;
+        //call the OnDragDelegate function when the Event System detects dragging
+        entry.callback.AddListener((data) => {
+            //Debug.Log("Alphabet Dragging");
+            MenuController.Instance.OnDrag(((PointerEventData)data).position);
+        });
+        //Add the trigger entry
+        trigger.triggers.Add(entry);
     }
 
     public void setMaterial(Material m) {
@@ -42,6 +57,27 @@ public class Alphabet : MonoBehaviour
         this.isSelected = isSelected;
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         meshRenderer.material.color = isSelected ? onSelectColor : naturalColor;
+    }
+
+    void OnMouseDown()
+    {
+        Debug.Log("MouseDown"+ gameObject.name);
+    }
+
+    void OnMouseUp()
+    {
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit = new RaycastHit();
+        if(Physics.Raycast(ray, out hit)) {
+            Debug.Log("MouseUP " + hit.transform.gameObject.name);
+            if (gameObject.name.Equals(hit.transform.gameObject.name))
+            {
+                MenuController.Instance.isDrag = false;
+                MenuController.Instance.OnSelectAlphabet(gameObject);
+                //SetIsSelected(!isSelected);
+            }
+            else MenuController.Instance.isDrag = true;
+        }
     }
 
     public void Explode(float time = 0.1f)
