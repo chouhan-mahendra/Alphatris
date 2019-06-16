@@ -75,7 +75,11 @@ socketIo.on("connection", socket => {
     });
 
     socket.on(GameActions.initializeSinglePlayerGame, (event) => {
+<<<<<<< HEAD
         subscription = interval(800).subscribe(counter => {
+=======
+        subscription = interval(2000).subscribe(counter => {
+>>>>>>> cc4be5d... server changes for isspecial functionality
             const alphabet = {
                 id : counter + 1,
                 x : Math.floor(Math.random() * 5), 
@@ -128,7 +132,7 @@ socketIo.on("connection", socket => {
                 if(timeToStop > 0) {
                     subscription.unsubscribe();
                     setTimeout(() => {
-                        subscription = interval(3000).subscribe(counter => {
+                        subscription = interval(2000).subscribe(counter => {
                             const alphabet = {
                                 id : counter + 1,
                                 x : Math.floor(Math.random() * 5), 
@@ -146,10 +150,11 @@ socketIo.on("connection", socket => {
     });
 
     var getScore = (word, specialCount, isDrag) => {
-        if (checkword.check(word.toLowerCase()) && word.length > 2) {
-            return word.length;
-        }
-        return 0;
+        // if (checkword.check(word.toLowerCase()) /*&& word.length > 2*/) {
+            // return word.length;
+        // }
+        // return 0;
+        return 1 + specialCount;
     }
 
     socket.on(GameActions.reset, (event) => {
