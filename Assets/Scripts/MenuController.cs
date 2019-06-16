@@ -73,7 +73,7 @@ public class MenuController : MonoBehaviour
                 RaycastHit hit = new RaycastHit();
                 return (Physics.Raycast(ray, out hit)) ? hit.transform.gameObject : null;
             })
-            .Where(gameObject => gameObject != null && gameObject.tag.Equals("Cube"))
+            .Where(gameObject => gameObject != null && gameObject.tag.Equals("Alphabet"))
             .DistinctUntilChanged(gameObject => gameObject.name)
             .Subscribe(item => {
                 //Debug.Log("unirx : " + item.name);
@@ -133,7 +133,6 @@ public class MenuController : MonoBehaviour
 
     public void onSubmitClicked()
     {
-        Debug.Log("in on submit clicked");
         List<int> idlist = new List<int>();
         currentSelection.ForEach(alphabet => idlist.Add(alphabet.id));
         GameController.Instance.UpdateScore(selection.text, idlist, isDrag);

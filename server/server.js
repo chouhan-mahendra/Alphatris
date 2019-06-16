@@ -48,7 +48,7 @@ var multiAvailable = [];
 console.log(`websocket server starting on {${PORT_WEBSOCKET}}`);
 
 const MIN_PLAYER_COUNT = 2;
-let subscription = undefined;
+var subscription = undefined;
 
 socketIo.on("connection", socket => {
 
@@ -103,7 +103,7 @@ socketIo.on("connection", socket => {
                 id : counter + 1,
                 x : Math.floor(Math.random() * 5), 
                 char : utils.getRandomChar(),
-                isSpecial: utils.isSpecial()
+                type: (utils.type() == 2 ? 1 : 0)
             };
             players[data.id].socket.emit(GameActions.spawnAlphabet, alphabet);
             players[multiplayerId].socket.emit(GameActions.spawnAlphabet, alphabet);
@@ -118,28 +118,29 @@ socketIo.on("connection", socket => {
         var specialPoints = parseInt(specialPointsCount);
         var specialTime = parseInt(specialTimeCount);
         const score = getScore(word, specialPoints, isDrag);
-        var timeToStop = specialTime * 10;
-        console.log(timeToStop);
-        if(timeToStop > 0) {
-            subscription.unsubscribe();
-            setTimeout(timeToStop*1000, () => {
-                subscription = interval(3000).subscribe(counter => {
-                    const alphabet = {
-                        id : counter + 1,
-                        x : Math.floor(Math.random() * 5), 
-                        char : utils.getRandomChar(),
-                        isSpecial: utils.isSpecial()
-                    };
-                });
-            });
-        }
+        var timeToStop = specialTime;
         if(score > 0) {
             socket.emit(GameActions.updateScore, {score, timeToStop});
             var currPlayer = players[data.id];
-            console.log(currPlayer.id);
             if(currPlayer.hasOwnProperty("playing")) {
                 console.log(players[currPlayer["playing"]].id);
                 players[currPlayer["playing"]].socket.emit(GameActions.checkAndDestroyAlphabet, {idList});
+            } else {
+                if(timeToStop > 0) {
+                    subscription.unsubscribe();
+                    setTimeout(() => {
+                        subscription = interval(3000).subscribe(counter => {
+                            const alphabet = {
+                                id : counter + 1,
+                                x : Math.floor(Math.random() * 5), 
+                                char : utils.getRandomChar(),
+                                type: utils.type()
+                            };
+                            console.log("here");
+                            socket.emit(GameActions.spawnAlphabet, alphabet);
+                        });
+                    }, timeToStop*1000);
+                }
             }
         } else {
             socket.emit(GameActions.invalidSelection);
@@ -147,10 +148,11 @@ socketIo.on("connection", socket => {
     });
 
     var getScore = (word, specialCount, isDrag) => {
-        if (checkword.check(word.toLowerCase()) /*&& word.length > 2*/) {
-            return word.length;
-        }
-        return 0;
+        // if (checkword.check(word.toLowerCase()) /*&& word.length > 2*/) {
+            // return word.length;
+        // }
+        // return 0;
+        return 1;
     }
 
     socket.on(GameActions.reset, (event) => {

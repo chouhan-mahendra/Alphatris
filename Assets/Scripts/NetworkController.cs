@@ -65,12 +65,15 @@ public class NetworkController : MonoBehaviour
     }
 
     private void OnSpawnAlphabet(SocketIOEvent e) {
+        Debug.Log("alphabet");
         int id = int.Parse(e.data["id"].ToString()); 
         int x = int.Parse(e.data["x"].ToString());
         int type = int.Parse(e.data["type"].ToString());
+        Debug.Log("alphabet 1");
         Vector3 position = new Vector3(x, 5, 0);
         string ch = (e.data["char"].ToString());
         GameController.Instance.CreateAlphabet(position, ch[1], id, type);
+        timer.Instance.isPaused = false;
     }
 
     private void OnInit(SocketIOEvent e)
@@ -135,7 +138,7 @@ public class NetworkController : MonoBehaviour
             }
         }
         jsonArray += "]";
-        string jsonString = string.Format(@"{{ ""word"" : ""{0}"" , ""wordList"" : ""{1}"", ""isDrag"" : ""{2}"", ""specialPointsCount"" : ""{3}"", ""specialTimeCount"" : ""{3}""}}", word, jsonArray, isDrag, specialPointsCount, specialTimeCount);
+        string jsonString = string.Format(@"{{ ""word"" : ""{0}"" , ""wordList"" : ""{1}"", ""isDrag"" : ""{2}"", ""specialPointsCount"" : ""{3}"", ""specialTimeCount"" : ""{4}""}}", word, jsonArray, isDrag, specialPointsCount, specialTimeCount);
         socket.Emit("submitSelection", new JSONObject(jsonString));
     }
 
@@ -144,6 +147,10 @@ public class NetworkController : MonoBehaviour
         int timeToStop = int.Parse(e.data["timeToStop"].ToString());
         Debug.Log(timeToStop);
         GameController.Instance.UpdateScore(scoreDelta);
+        if(timeToStop > 0) {
+            Debug.Log("in time to stop");
+            timer.Instance.isPaused = true;
+        }
     }
 
     private void OnDestroyAlphabet(SocketIOEvent e) {

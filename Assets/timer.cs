@@ -9,9 +9,11 @@
      public TextMeshProUGUI timerText;
  
      private float time;
+
+     public bool isPaused;
  
      void Update() {
-         if(!(GameController.Instance.currentState == GameController.GameState.STARTED)) {
+         if((!(GameController.Instance.currentState == GameController.GameState.STARTED)) || isPaused) {
              return;
          }
          time += Time.deltaTime;

@@ -18,7 +18,6 @@ public class ControllerCube : MonoBehaviour
     }
 
     void OnMouseEnter() {
-        Debug.Log("tourched");
         this.isTouched = true;
     }
 }

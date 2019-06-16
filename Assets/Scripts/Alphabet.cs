@@ -50,7 +50,6 @@ public class Alphabet : MonoBehaviour
     }
 
     public void makeSpecial(TYPE type) {
-        Debug.Log(type);
         switch(type) {
             case TYPE.EXTRA_POINTS:
                 GetComponent<MeshRenderer>().material = extraPointsMaterial;

@@ -33,12 +33,11 @@ function randomChar() {
 }
 
 function type() {
-  return 0;
-  var number = (Math.floor(Math.random() * (11 - 1)) + 1);
-  if(number > 2) {
+  var number = (Math.floor(Math.random() * (3 - 1)) + 1);
+  if(number < 2) {
     return 0;
   }
-  return number;
+  return 2;
 }
 
 module.exports = { getRandomName : haiku, getRandomID : randomID , getRandomChar : randomChar, type : type };
