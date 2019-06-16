@@ -75,7 +75,7 @@ socketIo.on("connection", socket => {
     });
 
     socket.on(GameActions.initializeSinglePlayerGame, (event) => {
-        subscription = interval(3000).subscribe(counter => {
+        subscription = interval(2000).subscribe(counter => {
             const alphabet = {
                 id : counter + 1,
                 x : Math.floor(Math.random() * 5), 
@@ -129,7 +129,7 @@ socketIo.on("connection", socket => {
                 if(timeToStop > 0) {
                     subscription.unsubscribe();
                     setTimeout(() => {
-                        subscription = interval(3000).subscribe(counter => {
+                        subscription = interval(2000).subscribe(counter => {
                             const alphabet = {
                                 id : counter + 1,
                                 x : Math.floor(Math.random() * 5), 
@@ -152,7 +152,7 @@ socketIo.on("connection", socket => {
             // return word.length;
         // }
         // return 0;
-        return 1;
+        return 1 + specialCount;
     }
 
     socket.on(GameActions.reset, (event) => {
