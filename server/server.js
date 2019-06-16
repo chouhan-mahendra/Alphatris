@@ -29,7 +29,8 @@ const GameActions = {
     multiplayerConnectionEstablished: "multiplayerConnectionEstablished",
     invalidSelection: "invalidSelection",
     playerReady: "playerReady",
-    checkAndDestroyAlphabet: "checkAndDestroyAlphabet"
+    checkAndDestroyAlphabet: "checkAndDestroyAlphabet",
+    reset: "reset"
 };
 
 app.get('/check', (req,res) => {
@@ -76,13 +77,13 @@ socketIo.on("connection", socket => {
         const {multiplayerId} = event;
         var mulIndex = multiAvailable.map(function(e) { return e; }).indexOf(multiplayerId);
         multiAvailable = multiAvailable.splice(mulIndex, 1);
+        if(!players.hasOwnProperty(multiplayerId)) {
+            return ;
+        }
         players[multiplayerId].playing = data.id;
         players[data.id].playing = multiplayerId;
         socket.emit(GameActions.multiplayerConnectionEstablished, {id1: data.id, id2: multiplayerId});
         players[multiplayerId].socket.emit(GameActions.playerReady);
-
-        players[data.id].socket.emit(GameActions.startGame);
-        players[multiplayerId].socket.emit(GameActions.startGame);
 
         subscription = interval(3000).subscribe(counter => {
             const alphabet = {
@@ -97,19 +98,18 @@ socketIo.on("connection", socket => {
     })
 
     socket.on(GameActions.submitSelection, (event) => {
-        const { word , alphabetList, isDrag } = event;
-        console.log(`${data.name} selected ${event.word}, ${alphabetList} [${checkword.check(event.word.toLowerCase())}], ${isDrag}`);
+        const { word , wordList, isDrag, specials } = event;
+        console.log(`${data.name} selected ${event.word}, ${idList} [${checkword.check(event.word.toLowerCase())}], ${isDrag}`);
 
-        const score = getScore(word, alphabetList, isDrag);
-        let idList = [];
-        for(let x in alphabetList) {
-            idList.add(x.id);
-        }
+        var idList = JSON.parse(wordList);
+        var specialCount = parseInt(specials);
+        const score = getScore(word, specialCount, isDrag);
         if(score > 0) {
-            socket.emit(GameActions.destroyAlphabet, { idList });
             socket.emit(GameActions.updateScore, {score});
             var currPlayer = players[data.id];
+            console.log(currPlayer.id);
             if(currPlayer.hasOwnProperty("playing")) {
+                console.log(players[currPlayer["playing"]].id);
                 players[currPlayer["playing"]].socket.emit(GameActions.checkAndDestroyAlphabet, {idList});
             }
         } else {
@@ -117,12 +117,21 @@ socketIo.on("connection", socket => {
         }
     });
 
-    var getScore = (word, alphabetList, isDrag) => {
-        if (checkword.check(word.toLowerCase()) && word.length > 2) {
+    var getScore = (word, specialCount, isDrag) => {
+        if (checkword.check(word.toLowerCase()) /*&& word.length > 2*/) {
             return word.length;
         }
         return 0;
     }
+
+    socket.on(GameActions.reset, (event) => {
+        console.log("reseting client");
+        delete players[data.id].playing
+        if(subscription) {
+            subscription.unsubscribe();
+            subscription = undefined;
+        }
+    });
 
     socket.on("disconnect", () => {
         console.log(`client ${data.id} disconnected!!`);

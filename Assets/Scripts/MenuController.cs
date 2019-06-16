@@ -120,9 +120,16 @@ public class MenuController : MonoBehaviour
     public void EndGame(int score)
     {
         gameOverText
-            .SetText("Your Final Score is "+ score);
+            .SetText("Score "+ score);
         gameOverMenu.SetActive(true);
         inGameMenu.SetActive(false);
+    }
+
+    public void reset() {
+        NetworkController.Instance.reset();
+        gameOverMenu.SetActive(false);
+        inGameMenu.SetActive(true);
+        GameController.Instance.StartGame((int)GameController.Instance.currentGameMode);
     }
 
     public void DisableWaitingForPlayersMenu() {

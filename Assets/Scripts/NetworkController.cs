@@ -118,6 +118,11 @@ public class NetworkController : MonoBehaviour
         socket.Emit("establishMultiplayerConnection", new JSONObject(string.Format(@"{{ ""multiplayerId"" : ""{0}""}}", multiplayerId)));
     }
 
+    public void reset() {
+        Debug.Log("in reset");
+        socket.Emit("reset");
+    }
+
     private void OnConnected(SocketIOEvent obj)
     {
         Debug.Log("connected to server");
@@ -126,16 +131,18 @@ public class NetworkController : MonoBehaviour
     public void submitSelection(string word, List<Tuple<int, bool>> idList, bool isDrag)
     {
         string jsonArray = "[";
+        int specialCount = 0;
         for (int i = 0; i < idList.Count; ++i)
         {
-            jsonArray += "{";
-            jsonArray += ("id:" + idList[i].Item1 + "," + "special:"+idList[i].Item2);
-            jsonArray += "}";
+            jsonArray += idList[i].Item1;
             if (i < idList.Count - 1)
                 jsonArray += ",";
+            if(idList[i].Item2) {
+                ++specialCount;
+            }
         }
         jsonArray += "]";
-        string jsonString = string.Format(@"{{ ""word"" : ""{0}"" , ""idList"" : ""{1}"", ""isDrag"" : ""{2}""}}", word, jsonArray, isDrag);
+        string jsonString = string.Format(@"{{ ""word"" : ""{0}"" , ""wordList"" : ""{1}"", ""isDrag"" : ""{2}"", ""specialCount"" : ""{3}""}}", word, jsonArray, isDrag, specialCount);
         socket.Emit("submitSelection", new JSONObject(jsonString));
     }
 
@@ -165,8 +172,6 @@ public class NetworkController : MonoBehaviour
         List<int> list = new List<int>();
         for (int i = 0; i < array.Count; ++i)
             list.Add(array[i]);
-        
-        Debug.Log("onDestroyAlphabet : " + array[0] + "," + array.Count);
         GameController.Instance.checkAndDestroyAlphabet(list);
     }
 

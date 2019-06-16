@@ -17,7 +17,6 @@ public class Alphabet : MonoBehaviour
 
     private void Start()
     {
-        naturalColor = GetComponent<MeshRenderer>().material.color;
         isSelected = false;
         foreach (Transform child in transform)
         {
@@ -26,6 +25,11 @@ public class Alphabet : MonoBehaviour
                 text.SetText(character.ToString());
             else Debug.Log("TextMeshPro not found");
         }
+    }
+
+    public void setMaterial(Material m) {
+        GetComponent<MeshRenderer>().material = m;
+        naturalColor = m.color;
     }
 
     public void SetIsSelected(bool isSelected)

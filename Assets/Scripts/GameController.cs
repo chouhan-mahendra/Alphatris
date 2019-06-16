@@ -25,6 +25,10 @@ public class GameController : MonoBehaviour
 
     public Material specialMaterial;
 
+    public List<Material> materials;
+
+    private Dictionary<char, Material> charMaterials;
+
     private float SCALE = 1;
     private List<Alphabet> currentSelection;
 
@@ -36,6 +40,19 @@ public class GameController : MonoBehaviour
             Destroy(gameObject);
         Time.timeScale = 1.8f;
         currentState = GameState.IN_LOBBY;
+    }
+
+    private void Start() {
+        charMaterials = new Dictionary<char, Material>();
+        int i = 0;
+        int j = 0;
+        while(i < 26) {
+            charMaterials[(char)(i + 65)] = materials[j++];
+            if(j == materials.Count) {
+                j = 0;
+            }
+            ++i;
+        }
     }
 
     public void StartGame(int mode)
@@ -109,6 +126,7 @@ public class GameController : MonoBehaviour
         alphabet.transform.localScale = Vector3.one * SCALE;
         alphabet.GetComponent<Alphabet>().id = id;
         alphabet.GetComponent<Alphabet>().character = character;
+        alphabet.GetComponent<Alphabet>().setMaterial(charMaterials[character]);
         alphabets[id] = alphabet;
         if(isSpecial) {
             alphabet.GetComponent<Alphabet>().makeSpecial(specialMaterial);
@@ -130,6 +148,7 @@ public class GameController : MonoBehaviour
     }
 
     public void UpdateScore(int scoreDelta) {
+        Debug.Log("in delta update score");
         if (scoreDelta > 0)
         {
             SCORE += scoreDelta;
