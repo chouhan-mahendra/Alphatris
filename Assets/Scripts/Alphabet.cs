@@ -13,7 +13,11 @@ public class Alphabet : MonoBehaviour
     private Color naturalColor;
     private bool isSelected;
 
-    private bool special;
+    public Material extraPointsMaterial;
+    public Material timeStopMaterial;
+
+    public enum TYPE {NORMAL, EXTRA_POINTS, TIME_STOP};
+    public TYPE alphabetType;
 
     private void Start()
     {
@@ -34,6 +38,7 @@ public class Alphabet : MonoBehaviour
 
     public void SetIsSelected(bool isSelected)
     {
+        Debug.Log("in selected");
         this.isSelected = isSelected;
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         meshRenderer.material.color = isSelected ? onSelectColor : naturalColor;
@@ -44,16 +49,28 @@ public class Alphabet : MonoBehaviour
         GetComponent<Destructible>().Explode(time);
     }
 
-    public void makeSpecial(Material material) {
-        GetComponent<MeshRenderer>().material = material;
-        this.special = true;
+    public void makeSpecial(TYPE type) {
+        Debug.Log(type);
+        switch(type) {
+            case TYPE.EXTRA_POINTS:
+                GetComponent<MeshRenderer>().material = extraPointsMaterial;
+                naturalColor = extraPointsMaterial.color;
+                break;
+            case TYPE.TIME_STOP:
+                GetComponent<MeshRenderer>().material = timeStopMaterial;
+                naturalColor = timeStopMaterial.color;
+                break;
+        }
     }
+
     public void replaceMaterial(Material material) {
         GetComponent<MeshRenderer>().material = material;
     }
 
     public bool isSpecial() {
-        return this.special;
+        if(!(this.alphabetType != TYPE.NORMAL))
+            return true;
+        return false;
     }
 
     public bool GetIsSelected() { return isSelected; }

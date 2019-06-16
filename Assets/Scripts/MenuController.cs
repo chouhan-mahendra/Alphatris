@@ -123,6 +123,7 @@ public class MenuController : MonoBehaviour
             .SetText("Score "+ score);
         gameOverMenu.SetActive(true);
         inGameMenu.SetActive(false);
+        timer.Instance.reset();
     }
 
     public void DisableWaitingForPlayersMenu() {

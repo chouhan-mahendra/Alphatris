@@ -80,7 +80,7 @@ socketIo.on("connection", socket => {
                 id : counter + 1,
                 x : Math.floor(Math.random() * 5), 
                 char : utils.getRandomChar(),
-                isSpecial: utils.isSpecial()
+                type: utils.type()
             };
             socket.emit(GameActions.spawnAlphabet, alphabet);
         });
@@ -111,14 +111,30 @@ socketIo.on("connection", socket => {
     });
 
     socket.on(GameActions.submitSelection, (event) => {
-        const { word , wordList, isDrag, specials } = event;
+        const { word , wordList, isDrag, specialPointsCount, specialTimeCount } = event;
         console.log(`${data.name} selected ${event.word}, ${idList} [${checkword.check(event.word.toLowerCase())}], ${isDrag}`);
 
         var idList = JSON.parse(wordList);
-        var specialCount = parseInt(specials);
-        const score = getScore(word, specialCount, isDrag);
+        var specialPoints = parseInt(specialPointsCount);
+        var specialTime = parseInt(specialTimeCount);
+        const score = getScore(word, specialPoints, isDrag);
+        var timeToStop = specialTime * 10;
+        console.log(timeToStop);
+        if(timeToStop > 0) {
+            subscription.unsubscribe();
+            setTimeout(timeToStop*1000, () => {
+                subscription = interval(3000).subscribe(counter => {
+                    const alphabet = {
+                        id : counter + 1,
+                        x : Math.floor(Math.random() * 5), 
+                        char : utils.getRandomChar(),
+                        isSpecial: utils.isSpecial()
+                    };
+                });
+            });
+        }
         if(score > 0) {
-            socket.emit(GameActions.updateScore, {score});
+            socket.emit(GameActions.updateScore, {score, timeToStop});
             var currPlayer = players[data.id];
             console.log(currPlayer.id);
             if(currPlayer.hasOwnProperty("playing")) {

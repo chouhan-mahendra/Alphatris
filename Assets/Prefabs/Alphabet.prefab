@@ -140,8 +140,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   character: 65
-  onSelectColor: {r: 0.46226418, g: 0.4600837, b: 0.4600837, a: 1}
+  onSelectColor: {r: 0.4811321, g: 0.4811321, b: 0.4811321, a: 1}
   id: 0
+  extraPointsMaterial: {fileID: 2100000, guid: 69de3b570b9444193ab4d10be7e0b6fc, type: 2}
+  timeStopMaterial: {fileID: 2100000, guid: b1699a24f5093486ba80fe84128d1bfe, type: 2}
+  alphabetType: 0
 --- !u!114 &2901823400375799876
 MonoBehaviour:
   m_ObjectHideFlags: 0

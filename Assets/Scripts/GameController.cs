@@ -23,8 +23,6 @@ public class GameController : MonoBehaviour
     public int SCORE = 0;
     public float SPAWN_RATE;
 
-    public Material specialMaterial;
-
     public List<Material> materials;
 
     private Dictionary<char, Material> charMaterials;
@@ -117,25 +115,18 @@ public class GameController : MonoBehaviour
         // this.alphaHolder.SetActive(false);
     }
 
-    void SpawnAlphabetLocal()
-    {
-        int x = (int) (Random.Range(0, ROWS) * SCALE);
-        Vector3 position = new Vector3(x , 5, 0);
-        char character = (char)(Random.Range(0, 26) + 65);
-        bool isSpecial = Random.Range(0, 10) == 1;
-        CreateAlphabet(position, character, Random.Range(0,100), isSpecial);
-    }
-
-    public void CreateAlphabet(Vector3 position, char character, int id, bool isSpecial) {
+    public void CreateAlphabet(Vector3 position, char character, int id, int type) {
+        Alphabet.TYPE alphabetType = (Alphabet.TYPE)type;
         GameObject alphabet = Instantiate(alphabetPrefab, position, Quaternion.identity);
         alphabet.name = character + "_" + id.ToString();
         alphabet.transform.localScale = Vector3.one * SCALE;
         alphabet.GetComponent<Alphabet>().id = id;
         alphabet.GetComponent<Alphabet>().character = character;
         alphabet.GetComponent<Alphabet>().setMaterial(charMaterials[character]);
+        alphabet.GetComponent<Alphabet>().alphabetType = alphabetType;
         alphabets[id] = alphabet;
-        if(isSpecial) {
-            alphabet.GetComponent<Alphabet>().makeSpecial(specialMaterial);
+        if(!(alphabetType == Alphabet.TYPE.NORMAL)) {
+            alphabet.GetComponent<Alphabet>().makeSpecial(alphabetType);
         }
     }
 
@@ -145,10 +136,10 @@ public class GameController : MonoBehaviour
         // else NetworkController.Instance.OnWordSelected(word, idList);
     }
 
-    private List<Tuple<int, bool>> getLetterList(List<int> idList) {
-        var list = new List<Tuple<int, bool>>();
+    private List<Tuple<int, int>> getLetterList(List<int> idList) {
+        var list = new List<Tuple<int, int>>();
         foreach(int id in idList) {
-            list.Add(Tuple.Create(id, alphabets[id].GetComponent<Alphabet>().isSpecial()));
+            list.Add(Tuple.Create(id, (int)alphabets[id].GetComponent<Alphabet>().alphabetType));
         }
         return list;
     }

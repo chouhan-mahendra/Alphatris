@@ -191,6 +191,14 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 204401812, guid: ab387b4d30a514053b6a9043917639f1, type: 3}
+      propertyPath: timeStopMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: b1699a24f5093486ba80fe84128d1bfe, type: 2}
+    - target: {fileID: 204401812, guid: ab387b4d30a514053b6a9043917639f1, type: 3}
+      propertyPath: extraPointsMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 69de3b570b9444193ab4d10be7e0b6fc, type: 2}
     - target: {fileID: 1920710176688670556, guid: ab387b4d30a514053b6a9043917639f1,
         type: 3}
       propertyPath: m_Delegates.Array.size

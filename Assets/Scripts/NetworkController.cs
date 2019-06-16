@@ -29,7 +29,6 @@ public class NetworkController : MonoBehaviour
         socket = GetComponent<SocketIOComponent>();
         socket.On("open",OnConnected);
         socket.On("init", OnInit);
-        socket.On("startGame", OnStartGame);
         socket.On("playerDisconnected", OnPlayerDisconnected);
         socket.On("spawnAlphabet", OnSpawnAlphabet);
         socket.On("updateScore", OnUpdateScore);
@@ -65,26 +64,13 @@ public class NetworkController : MonoBehaviour
         GameController.Instance.playerReady();
     }
 
-    private void OnStartGame(SocketIOEvent e)
-    {
-        Debug.Log(e.data["x"].ToString() + e.data["char"].ToString());
-        int id = int.Parse(e.data["id"].ToString()); 
-        int x = int.Parse(e.data["x"].ToString());
-        Vector3 position = new Vector3(x, 5, 0);
-        string ch = (e.data["char"].ToString());
-        Debug.Log("Players are online, Starting new game from " + position + "," + ch[1]);
-        GameController.Instance.StartGame(1);
-        GameController.Instance.CreateAlphabet(position, ch[1], id, false);
-    }
-
     private void OnSpawnAlphabet(SocketIOEvent e) {
-        Debug.Log(e.data["x"].ToString() + e.data["char"].ToString());
         int id = int.Parse(e.data["id"].ToString()); 
         int x = int.Parse(e.data["x"].ToString());
-        bool isSpecial = bool.Parse(e.data["isSpecial"].ToString());
+        int type = int.Parse(e.data["type"].ToString());
         Vector3 position = new Vector3(x, 5, 0);
         string ch = (e.data["char"].ToString());
-        GameController.Instance.CreateAlphabet(position, ch[1], id, isSpecial);
+        GameController.Instance.CreateAlphabet(position, ch[1], id, type);
     }
 
     private void OnInit(SocketIOEvent e)
@@ -132,27 +118,31 @@ public class NetworkController : MonoBehaviour
         Debug.Log("connected to server");
     }
 
-    public void submitSelection(string word, List<Tuple<int, bool>> idList, bool isDrag)
+    public void submitSelection(string word, List<Tuple<int, int>> idList, bool isDrag)
     {
         string jsonArray = "[";
-        int specialCount = 0;
+        int specialPointsCount = 0;
+        int specialTimeCount = 0;
         for (int i = 0; i < idList.Count; ++i)
         {
             jsonArray += idList[i].Item1;
             if (i < idList.Count - 1)
                 jsonArray += ",";
-            if(idList[i].Item2) {
-                ++specialCount;
+            if(idList[i].Item2 == 1) {
+                ++specialPointsCount;
+            } else if(idList[i].Item2 == 2) {
+                ++specialTimeCount;
             }
         }
         jsonArray += "]";
-        string jsonString = string.Format(@"{{ ""word"" : ""{0}"" , ""wordList"" : ""{1}"", ""isDrag"" : ""{2}"", ""specialCount"" : ""{3}""}}", word, jsonArray, isDrag, specialCount);
+        string jsonString = string.Format(@"{{ ""word"" : ""{0}"" , ""wordList"" : ""{1}"", ""isDrag"" : ""{2}"", ""specialPointsCount"" : ""{3}"", ""specialTimeCount"" : ""{3}""}}", word, jsonArray, isDrag, specialPointsCount, specialTimeCount);
         socket.Emit("submitSelection", new JSONObject(jsonString));
     }
 
     private void OnUpdateScore(SocketIOEvent e) {
         int scoreDelta = int.Parse(e.data["score"].ToString());
-        Debug.Log("ScoreDelta " + scoreDelta);
+        int timeToStop = int.Parse(e.data["timeToStop"].ToString());
+        Debug.Log(timeToStop);
         GameController.Instance.UpdateScore(scoreDelta);
     }
 

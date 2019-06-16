@@ -32,8 +32,13 @@ function randomChar() {
   return characters[Math.floor(Math.random() * characters.length)];
 }
 
-function isSpecial() {
-  return (Math.floor(Math.random() * (10 - 1)) + 1) == 1;
+function type() {
+  return 0;
+  var number = (Math.floor(Math.random() * (11 - 1)) + 1);
+  if(number > 2) {
+    return 0;
+  }
+  return number;
 }
 
-module.exports = { getRandomName : haiku, getRandomID : randomID , getRandomChar : randomChar, isSpecial : isSpecial };
+module.exports = { getRandomName : haiku, getRandomID : randomID , getRandomChar : randomChar, type : type };
