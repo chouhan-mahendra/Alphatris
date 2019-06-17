@@ -44,6 +44,26 @@ public class NetworkController : MonoBehaviour
         //Debug.Log("3 :" + array3.Count);
     }
 
+    public void restart()
+    {
+        socket = GetComponent<SocketIOComponent>();
+        socket.On("open",OnConnected);
+        socket.On("init", OnInit);
+        socket.On("playerDisconnected", OnPlayerDisconnected);
+        socket.On("spawnAlphabet", OnSpawnAlphabet);
+        socket.On("updateScore", OnUpdateScore);
+        socket.On("destroyAlphabet", OnDestroyAlphabet);
+        socket.On("multiplayerConnectionEstablished", multiplayerConnectionEstablished);
+        socket.On("invalidSelection", invalidSelection);
+        socket.On("playerReady", playerReady);
+        socket.On("checkAndDestroyAlphabet", checkAndDestroyAlphabet);
+
+        //var array2 = JSON.Parse("[1,2,3]");
+        //var array3 = JSON.Parse("\"[1,2,3]\"".Replace("\"",""));
+        //Debug.Log("2 :" + array2.Count);
+        //Debug.Log("3 :" + array3.Count);
+    }
+
     //TODO : write reconnection logic
     public void RequestConnection()
     {
@@ -53,8 +73,12 @@ public class NetworkController : MonoBehaviour
     public void DisableNetwork()
     {
         socket.enabled = false;
+        socket.Emit("disconnect");
     }
 
+    public bool socketState() {
+        return socket.enabled;
+    }
     private void OnPlayerDisconnected(SocketIOEvent e)
     {
         Debug.Log("Player disconnected {" + e.data["id"] + ","+ e.data["name"] + "}");
@@ -97,7 +121,7 @@ public class NetworkController : MonoBehaviour
             multiId = id1;
         }
         if(multiId != "") {
-            GameController.Instance.chooseMultiplayerId(multiId);
+            GameController.Instance.setMultiplayerId(multiId);
         }
     }
 

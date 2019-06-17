@@ -9,7 +9,7 @@ using Random = UnityEngine.Random;
 public class GameController : MonoBehaviour
 {
     public static GameController Instance;
-    public enum GameState { STARTED, PAUSED, IN_LOBBY, WAITING_FOR_PLAYERS }
+    public enum GameState { STARTED, IN_LOBBY, WAITING_FOR_PLAYERS }
     public enum Mode { LOCAL, MULTIPLAYER }
 
     public GameState currentState;
@@ -65,11 +65,17 @@ public class GameController : MonoBehaviour
             case Mode.LOCAL: 
                 //Keep instantiating new aplhabets
                 currentState = GameState.STARTED;
+                if(NetworkController.Instance.socketState()) {
+                    NetworkController.Instance.initializeSinglePlayerGame();
+                }
                 NetworkController.Instance.RequestConnection();
                 // InvokeRepeating("SpawnAlphabetLocal", 1.0f, SPAWN_RATE);
                 break;
             case Mode.MULTIPLAYER:
                 currentState = GameState.WAITING_FOR_PLAYERS;
+                if(NetworkController.Instance.socketState()) {
+                    chooseMultiplayerId("-1");
+                }
                 NetworkController.Instance.RequestConnection();
                 break;
         }
@@ -88,7 +94,6 @@ public class GameController : MonoBehaviour
             Debug.Log(multiplayerId);
             Debug.Log(multiplayerId.Length);
             if(multiplayerId != "-1") {
-                currentState = GameState.STARTED;
                 MenuController.Instance.DisableWaitingForPlayersMenu();
                 NetworkController.Instance.establishMultiplayerConnection(multiplayerId);
             } else {
@@ -99,7 +104,12 @@ public class GameController : MonoBehaviour
         }
     }
 
+    public void setMultiplayerId(string multiplayerId) {
+        currentState = GameState.STARTED;
+    }
+
     public void playerReady() {
+        currentState = GameState.STARTED;
         MenuController.Instance.DisableWaitingForPlayersMenu();
     }
 
@@ -110,7 +120,9 @@ public class GameController : MonoBehaviour
 
     public void EndGame()
     {
+        alphabets.Clear();
         Time.timeScale = 0f;
+        currentSelection.Clear();
         MenuController.Instance.EndGame(SCORE);
         // this.alphaHolder.SetActive(false);
     }
@@ -146,6 +158,7 @@ public class GameController : MonoBehaviour
 
     public void UpdateScore(int scoreDelta) {
         Debug.Log("in delta update score");
+        Debug.Log(scoreDelta);
         if (scoreDelta > 0)
         {
             SCORE += scoreDelta;

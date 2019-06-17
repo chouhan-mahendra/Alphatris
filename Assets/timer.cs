@@ -6,16 +6,20 @@
  public class timer : MonoBehaviour {
 
      public static timer Instance;
+     private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else if (Instance != this)
+            Destroy(gameObject);
+    }
      public TextMeshProUGUI timerText;
  
      private float time;
 
      public static bool isPaused;
- 
+
      void Update() {
-         if(isPaused) {
-             Debug.Log("Jasdeep");
-         }
          if((!(GameController.Instance.currentState == GameController.GameState.STARTED)) || isPaused) {
              return;
          }
@@ -30,6 +34,7 @@
      }
 
      public void reset() {
+         time = 0;
          timerText.text = "0";
      }
  }

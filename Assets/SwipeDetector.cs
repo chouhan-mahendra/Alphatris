@@ -92,14 +92,6 @@ public class SwipeDetector : MonoBehaviour {
         }
     }
 
-    void OnGUI() {
-        // Display the appropriate message
-        GUI.Label(new Rect((Screen.width-mMessageWidth)/2,
-                           (Screen.height-mMessageHeight)/2,
-                            mMessageWidth, mMessageHeight),
-                  mMessage[mMessageIndex]);
-    }
-
     private void OnSwipeLeft() {
         mMessageIndex = 1;
         if(controllerCube.GetComponent<ControllerCube>().isTouched) {

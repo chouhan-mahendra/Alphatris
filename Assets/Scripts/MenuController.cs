@@ -17,10 +17,7 @@ public class MenuController : MonoBehaviour
         else if (Instance != this)
             Destroy(gameObject);
     }
-
-    public GameObject pauseMenu;
     public GameObject startMenu;
-    public GameObject settingsMenu;
     public GameObject waitingForPlayersMenu;
     public GameObject inGameMenu;
     public GameObject gameOverMenu;
@@ -50,17 +47,6 @@ public class MenuController : MonoBehaviour
         if(Input.touchCount == 2) {
             this.onSubmitClicked();
         }
-
-        if(Input.GetKeyDown(KeyCode.Escape)) {
-            if (state == GameController.GameState.PAUSED)
-            {
-                Resume();
-            }
-            else if(state == GameController.GameState.STARTED)
-            {
-                Pause();
-            }
-        }
     }
 
     internal void OnDrag(Vector2 position)
@@ -77,7 +63,7 @@ public class MenuController : MonoBehaviour
             RaycastHit hit = new RaycastHit();
             return (Physics.Raycast(ray, out hit)) ? hit.transform.gameObject : null;
         })
-        .Where(gameObject => gameObject != null && gameObject.tag.Equals("Alphabet"))
+        .Where(gameObject => gameObject != null && gameObject.tag.Equals("Alphabet") && inGameMenu.activeSelf)
         //.ThrottleFirst(TimeSpan.FromMilliseconds(100))
         .DistinctUntilChanged(gameObject => {
             Alphabet alp = gameObject.GetComponent<Alphabet>();
@@ -90,6 +76,9 @@ public class MenuController : MonoBehaviour
 
     internal void OnSelectAlphabet(GameObject item)    
     {
+        if(!inGameMenu.activeSelf) {
+            return ;
+        }
         //Debug.Log("unirx : " + item.name);
         Alphabet alphabet = item.GetComponent<Alphabet>();
         int index = currentSelection.FindIndex(it => it.name.Equals(item.name));
@@ -114,28 +103,16 @@ public class MenuController : MonoBehaviour
         selection.text = currentText;
     }
 
-
-    public void Pause()
-    {
-        pauseMenu.SetActive(true);
-        GameController.Instance.SetState(GameController.GameState.PAUSED);
-        Time.timeScale = 0f;
-    }
-
-    public void Resume()
-    {
-        pauseMenu.SetActive(false);
-        Time.timeScale = 1f;
-        GameController.Instance.SetState(GameController.GameState.STARTED);
-    }
-
     public void EndGame(int score)
     {
         gameOverText
             .SetText("Score "+ score);
         gameOverMenu.SetActive(true);
         inGameMenu.SetActive(false);
+        UnSelectAll();
+        currentSelection = new List<Alphabet>();
         timer.Instance.reset();
+        NetworkController.Instance.reset();
     }
 
     public void DisableWaitingForPlayersMenu() {
@@ -172,10 +149,12 @@ public class MenuController : MonoBehaviour
         foreach(GameObject item in alphabets) {
             Destroy(item);
         }
-        NetworkController.Instance.reset();
         gameOverMenu.SetActive(false);
         inGameMenu.SetActive(true);
         GameController.Instance.StartGame((int)GameController.Instance.currentGameMode);
+        if(GameController.Instance.currentGameMode == GameController.Mode.LOCAL) {
+            NetworkController.Instance.initializeSinglePlayerGame();
+        }
     }
 
     public void onBackPressed() {

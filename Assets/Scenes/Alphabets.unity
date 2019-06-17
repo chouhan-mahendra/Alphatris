@@ -125,7 +125,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 204401811, guid: ab387b4d30a514053b6a9043917639f1, type: 3}
       propertyPath: m_TagString
-      value: Alphabet
+      value: Cube
       objectReference: {fileID: 0}
     - target: {fileID: 204401810, guid: ab387b4d30a514053b6a9043917639f1, type: 3}
       propertyPath: m_LocalPosition.x

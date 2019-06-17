@@ -75,7 +75,7 @@ socketIo.on("connection", socket => {
     });
 
     socket.on(GameActions.initializeSinglePlayerGame, (event) => {
-        subscription = interval(3000).subscribe(counter => {
+        subscription = interval(800).subscribe(counter => {
             const alphabet = {
                 id : counter + 1,
                 x : Math.floor(Math.random() * 5), 
@@ -112,7 +112,6 @@ socketIo.on("connection", socket => {
 
     socket.on(GameActions.submitSelection, (event) => {
         const { word , wordList, isDrag, specialPointsCount, specialTimeCount } = event;
-        console.log(`${data.name} selected ${event.word}, ${idList} [${checkword.check(event.word.toLowerCase())}], ${isDrag}`);
 
         var idList = JSON.parse(wordList);
         var specialPoints = parseInt(specialPointsCount);
@@ -136,7 +135,6 @@ socketIo.on("connection", socket => {
                                 char : utils.getRandomChar(),
                                 type: utils.type()
                             };
-                            console.log("here");
                             socket.emit(GameActions.spawnAlphabet, alphabet);
                         });
                     }, timeToStop*1000);
@@ -148,16 +146,15 @@ socketIo.on("connection", socket => {
     });
 
     var getScore = (word, specialCount, isDrag) => {
-        // if (checkword.check(word.toLowerCase()) /*&& word.length > 2*/) {
-            // return word.length;
-        // }
-        // return 0;
-        return 1;
+        if (checkword.check(word.toLowerCase()) && word.length > 2) {
+            return word.length;
+        }
+        return 0;
     }
 
     socket.on(GameActions.reset, (event) => {
         console.log("reseting client");
-        delete players[data.id].playing
+        // delete players[data.id].playing
         if(subscription) {
             subscription.unsubscribe();
             subscription = undefined;
