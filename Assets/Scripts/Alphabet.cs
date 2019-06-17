@@ -92,9 +92,9 @@ public class Alphabet : MonoBehaviour
         }
     }
 
-    public void Explode(float time = 0.1f)
+    public void Explode(float time = 0.1f, int type = 1)
     {
-        GetComponent<Destructible>().Explode(time);
+        GetComponent<Destructible>().Explode(time, type);
     }
 
     public void makeSpecial(TYPE type) {

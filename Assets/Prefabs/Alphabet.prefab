@@ -128,6 +128,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   onDestroyEffect: {fileID: 1337198075554910, guid: 8cc2d0f8b5690494aa0992cc46c63a7b,
     type: 3}
+  onDestroyBig: {fileID: 1828176872806910, guid: 64891a0eb28db934898420d80ca07cb3,
+    type: 3}
 --- !u!114 &204401812
 MonoBehaviour:
   m_ObjectHideFlags: 0
