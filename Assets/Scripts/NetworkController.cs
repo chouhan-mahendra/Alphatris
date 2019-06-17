@@ -136,7 +136,7 @@ public class NetworkController : MonoBehaviour
 
     public void reset() {
         Debug.Log("in reset");
-        socket.Emit("reset");
+        socket.Emit("reset", new JSONObject());
     }
 
     private void OnConnected(SocketIOEvent obj)
