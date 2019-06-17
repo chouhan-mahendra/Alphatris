@@ -13,7 +13,7 @@ public class Alphabet : MonoBehaviour
     public static float AudioPitch = 0.8f;
     private Color naturalColor;
     private bool isSelected;
-    private AudioSource audioSource;
+    public AudioSource onSelectAudioSrc;
 
     public Material extraPointsMaterial;
     public Material timeStopMaterial;
@@ -25,7 +25,7 @@ public class Alphabet : MonoBehaviour
     private void Start()
     {
         isSelected = false;
-        audioSource = GetComponent<AudioSource>();
+        onSelectAudioSrc = GetComponent<AudioSource>();
         foreach (Transform child in transform)
         {
             TextMeshPro text = child.gameObject.GetComponent<TextMeshPro>();
@@ -69,8 +69,8 @@ public class Alphabet : MonoBehaviour
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         meshRenderer.material.color = isSelected ? onSelectColor : naturalColor;
         AudioPitch += (isSelected) ? 0.1f : -0.1f;
-        audioSource.pitch = AudioPitch;
-        audioSource.Play();
+        onSelectAudioSrc.pitch = AudioPitch;
+        onSelectAudioSrc.Play();
     }
 
     void OnMouseDown()
