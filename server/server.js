@@ -10,10 +10,11 @@ const app = express();
 
 const socketIo = require("socket.io")(PORT_WEBSOCKET);
 const utils = require("./utils.js");
-const checkword = require("check-word")("en");
+// const checkword = require("check-word")("en");
 const { interval } = require('rxjs');
 const { map, skip, take } = require('rxjs/operators');
-
+const wordsList = require('./words_dictionary.json');
+    
 const GameActions = {
     init : "init",
     playerConnected : "playerConnected",
@@ -112,7 +113,7 @@ socketIo.on("connection", socket => {
 
     socket.on(GameActions.submitSelection, (event) => {
         const { word , wordList, isDrag, specialPointsCount, specialTimeCount } = event;
-        console.log(`${data.name} selected ${event.word}, ${idList} [${checkword.check(event.word.toLowerCase())}], ${isDrag}`);
+        console.log(`${data.name} selected ${word}, ${idList} [${wordsList[word.toLowerCase()]}, ${isDrag}]`);
 
         var idList = JSON.parse(wordList);
         var specialPoints = parseInt(specialPointsCount);
@@ -148,11 +149,10 @@ socketIo.on("connection", socket => {
     });
 
     var getScore = (word, specialCount, isDrag) => {
-        // if (checkword.check(word.toLowerCase()) /*&& word.length > 2*/) {
-            // return word.length;
-        // }
-        // return 0;
-        return 1 + specialCount;
+        if (word.length >= 2 && wordsList[word.toLowerCase()] ) {
+            return word.length + specialCount;
+        }
+        return 0;
     }
 
     socket.on(GameActions.reset, (event) => {
