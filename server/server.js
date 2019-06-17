@@ -32,7 +32,8 @@ const GameActions = {
     playerReady: "playerReady",
     checkAndDestroyAlphabet: "checkAndDestroyAlphabet",
     reset: "reset",
-    initializeSinglePlayerGame: "initializeSinglePlayerGame"
+    initializeSinglePlayerGame: "initializeSinglePlayerGame",
+    opponentScore: "opponentScore"
 };
 
 app.get('/check', (req,res) => {
@@ -125,6 +126,7 @@ socketIo.on("connection", socket => {
             var currPlayer = players[data.id];
             if(currPlayer.hasOwnProperty("playing")) {
                 console.log(players[currPlayer["playing"]].id);
+                players[currPlayer["playing"]].socket.emit(GameActions.opponentScore, {score});
                 players[currPlayer["playing"]].socket.emit(GameActions.checkAndDestroyAlphabet, {idList});
             } else {
                 if(timeToStop > 0) {

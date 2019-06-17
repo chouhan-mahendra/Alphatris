@@ -26,6 +26,8 @@ public class MenuController : MonoBehaviour
     public GameObject gameOverMenu;
 
     public TextMeshProUGUI score;
+
+    public TextMeshPro oscore;
     public TextMeshProUGUI selection;
     public TextMeshProUGUI gameOverText;
 
@@ -40,6 +42,9 @@ public class MenuController : MonoBehaviour
         switch(state) {
             case GameController.GameState.STARTED:
                 score.SetText("SCORE " + GameController.Instance.SCORE);
+                if(GameController.Instance.OSCORE > 0) {
+                    oscore.SetText("OSCORE " + GameController.Instance.OSCORE);
+                }
                 break;
         }
 

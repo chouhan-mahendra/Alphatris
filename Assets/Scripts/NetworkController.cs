@@ -37,6 +37,7 @@ public class NetworkController : MonoBehaviour
         socket.On("invalidSelection", invalidSelection);
         socket.On("playerReady", playerReady);
         socket.On("checkAndDestroyAlphabet", checkAndDestroyAlphabet);
+        socket.On("opponentScore", opponentScore);
 
         //var array2 = JSON.Parse("[1,2,3]");
         //var array3 = JSON.Parse("\"[1,2,3]\"".Replace("\"",""));
@@ -172,6 +173,11 @@ public class NetworkController : MonoBehaviour
             Debug.Log("in time to stop");
             timer.isPaused = true;
         }
+    }
+
+    private void opponentScore(SocketIOEvent e) {
+        int scoreDelta = int.Parse(e.data["score"].ToString());
+        GameController.Instance.UpdateOpponentScore(scoreDelta);
     }
 
     private void OnDestroyAlphabet(SocketIOEvent e) {

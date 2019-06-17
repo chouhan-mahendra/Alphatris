@@ -21,6 +21,8 @@ public class GameController : MonoBehaviour
     public float ROWS = 4;
     public float WIDTH = 10;
     public int SCORE = 0;
+
+    public int OSCORE = 0;
     public float SPAWN_RATE;
 
     public List<Material> materials;
@@ -177,6 +179,12 @@ public class GameController : MonoBehaviour
             MenuController.Instance.DestroySelection();
         }
         else MenuController.Instance.UnSelectAll();
+    }
+
+    public void UpdateOpponentScore(int scoreDelta) {
+        if(scoreDelta > 0) {
+            OSCORE += scoreDelta;
+        }
     }
 
     public void DestroyAlphabet(List<int> list) {
