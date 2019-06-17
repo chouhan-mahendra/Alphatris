@@ -150,7 +150,8 @@ socketIo.on("connection", socket => {
 
     var getScore = (word, specialCount, isDrag) => {
         if (word.length >= 2 && wordsList[word.toLowerCase()] ) {
-            return word.length + specialCount;
+            const multiplier = isDrag ? 2 : 1;
+            return (word.length + specialCount) * multiplier;
         }
         return 0;
     }
