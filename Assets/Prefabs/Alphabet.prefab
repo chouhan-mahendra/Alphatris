@@ -144,6 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   character: 65
   onSelectColor: {r: 0.4811321, g: 0.4811321, b: 0.4811321, a: 1}
+  invalidateColor: {r: 0.9622642, g: 0.17702031, b: 0.17702031, a: 0.6}
   id: 0
   onSelectAudioSrc: {fileID: 4925457473220634862}
   extraPointsMaterial: {fileID: 2100000, guid: 69de3b570b9444193ab4d10be7e0b6fc, type: 2}

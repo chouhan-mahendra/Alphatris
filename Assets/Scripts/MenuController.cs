@@ -176,7 +176,10 @@ public class MenuController : MonoBehaviour
     {
         selection.text = "";
         for (int i = 0; i < currentSelection.Count; ++i)
+        {
             currentSelection[i].SetIsSelected(false);
+            StartCoroutine(currentSelection[i].PutInvalidColorForFeedback());
+        }
         currentSelection.Clear();
         AudioSource.PlayClipAtPoint(unselectAudioClip, transform.position);
     }

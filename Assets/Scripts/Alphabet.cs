@@ -9,6 +9,7 @@ public class Alphabet : MonoBehaviour
 {
     public char character;
     public Color onSelectColor;
+    public Color invalidateColor;
     public int id;
     public static float AudioPitch = 0.8f;
     private Color naturalColor;
@@ -146,5 +147,12 @@ public class Alphabet : MonoBehaviour
             }
         }
         return neighbours;
+    }
+
+    internal IEnumerator PutInvalidColorForFeedback()
+    {
+        GetComponent<MeshRenderer>().material.color = invalidateColor;
+        yield return new WaitForSeconds(0.5f);
+        GetComponent<MeshRenderer>().material.color = naturalColor;
     }
 }
