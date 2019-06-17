@@ -10,6 +10,9 @@ using UnityEngine.EventSystems;
 public class MenuController : MonoBehaviour
 {
     public static MenuController Instance;
+    public AudioClip unselectAudioClip;
+
+    private AudioSource audioSource;
     private void Awake()
     {
         if (Instance == null)
@@ -57,6 +60,7 @@ public class MenuController : MonoBehaviour
 
     private void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         dragStream
         .Select(position => {
             var ray = Camera.main.ScreenPointToRay(position);
@@ -149,8 +153,12 @@ public class MenuController : MonoBehaviour
     {
         selection.text = "";
         for (int i = 0; i < currentSelection.Count; ++i)
+        {
             currentSelection[i].SetIsSelected(false);
+            StartCoroutine(currentSelection[i].PutInvalidColorForFeedback());
+        }
         currentSelection.Clear();
+        AudioSource.PlayClipAtPoint(unselectAudioClip, transform.position);
     }
 
     public void reset() {

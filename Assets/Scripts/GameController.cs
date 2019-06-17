@@ -18,7 +18,7 @@ public class GameController : MonoBehaviour
     public GameObject alphabetPrefab;
     
     public Dictionary<int, GameObject> alphabets;
-    public int ROWS = 4;
+    public float ROWS = 4;
     public float WIDTH = 10;
     public int SCORE = 0;
     public float SPAWN_RATE;
@@ -154,7 +154,7 @@ public class GameController : MonoBehaviour
         foreach(int id in idList) {
             var type = alphabets[id].GetComponent<Alphabet>().alphabetType;
             if(type == Alphabet.TYPE.BOMBERMAN) {
-                explosionCount += 2;
+                explosionCount += alphabets[id].GetComponent<Alphabet>().FindNeighbours().Count;
             }
         }
         return explosionCount;

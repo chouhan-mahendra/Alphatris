@@ -9,10 +9,12 @@ public class Alphabet : MonoBehaviour
 {
     public char character;
     public Color onSelectColor;
+    public Color invalidateColor;
     public int id;
-
+    public static float AudioPitch = 0.8f;
     private Color naturalColor;
     private bool isSelected;
+    public AudioSource onSelectAudioSrc;
 
     public Material extraPointsMaterial;
     public Material timeStopMaterial;
@@ -24,6 +26,7 @@ public class Alphabet : MonoBehaviour
     private void Start()
     {
         isSelected = false;
+        onSelectAudioSrc = GetComponent<AudioSource>();
         foreach (Transform child in transform)
         {
             TextMeshPro text = child.gameObject.GetComponent<TextMeshPro>();
@@ -66,6 +69,9 @@ public class Alphabet : MonoBehaviour
         this.isSelected = isSelected;
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         meshRenderer.material.color = isSelected ? onSelectColor : naturalColor;
+        AudioPitch += (isSelected) ? 0.1f : -0.1f;
+        onSelectAudioSrc.pitch = AudioPitch;
+        onSelectAudioSrc.Play();
     }
 
     void OnMouseDown()
@@ -87,9 +93,9 @@ public class Alphabet : MonoBehaviour
         }
     }
 
-    public void Explode(float time = 0.1f)
+    public void Explode(float time = 0.1f, int type = 1)
     {
-        GetComponent<Destructible>().Explode(time);
+        GetComponent<Destructible>().Explode(time, type);
     }
 
     public void makeSpecial(TYPE type) {
@@ -141,5 +147,12 @@ public class Alphabet : MonoBehaviour
             }
         }
         return neighbours;
+    }
+
+    internal IEnumerator PutInvalidColorForFeedback()
+    {
+        GetComponent<MeshRenderer>().material.color = invalidateColor;
+        yield return new WaitForSeconds(0.5f);
+        GetComponent<MeshRenderer>().material.color = naturalColor;
     }
 }
