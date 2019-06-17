@@ -102,17 +102,19 @@ public class SwipeDetector : MonoBehaviour {
 
     private void OnSwipeLeft() {
         mMessageIndex = 1;
+        Debug.Log("on swipe left");
+        MenuController.Instance.UnSelectAll();
         if(controllerCube.GetComponent<ControllerCube>().isTouched) {
             controllerCube.GetComponent<ControllerCube>().isTouched = false;
-            MenuController.Instance.UnSelectAll();
         }
     }
 
     private void OnSwipeRight() {
+        Debug.Log("on swipe right");
         mMessageIndex = 2;
+        MenuController.Instance.onSubmitClicked();
         if(controllerCube.GetComponent<ControllerCube>().isTouched) {
             controllerCube.GetComponent<ControllerCube>().isTouched = false;
-            MenuController.Instance.onSubmitClicked();
         }
     }
 
