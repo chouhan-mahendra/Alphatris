@@ -34,7 +34,7 @@ function randomChar() {
 
 function type() {
   var number = (Math.floor(Math.random() * (10 - 1)) + 1);
-  if(number > 2) {
+  if(number > 3) {
     return 0;
   }
   return number;
