@@ -9,7 +9,7 @@ using Random = UnityEngine.Random;
 public class GameController : MonoBehaviour
 {
     public static GameController Instance;
-    public enum GameState { STARTED, PAUSED, IN_LOBBY }
+    public enum GameState { STARTED, IN_LOBBY, WAITING_FOR_PLAYERS }
     public enum Mode { LOCAL, MULTIPLAYER }
 
     public GameState currentState;
@@ -18,15 +18,21 @@ public class GameController : MonoBehaviour
     public GameObject alphabetPrefab;
     
     public Dictionary<int, GameObject> alphabets;
-    public int ROWS = 4;
+    public float ROWS = 4;
     public float WIDTH = 10;
     public int SCORE = 0;
-    public int SPAWN_RATE = 2;
 
-    public Material specialMaterial;
+    public int OSCORE = 0;
+    public float SPAWN_RATE;
+
+    public List<Material> materials;
+
+    private Dictionary<char, Material> charMaterials;
 
     private float SCALE = 1;
     private List<Alphabet> currentSelection;
+
+    public GameObject alphaHolder;
 
     private void Awake()
     {
@@ -38,24 +44,42 @@ public class GameController : MonoBehaviour
         currentState = GameState.IN_LOBBY;
     }
 
-    public void RequestConnection() {
-        NetworkController.Instance.RequestConnection();
+    private void Start() {
+        charMaterials = new Dictionary<char, Material>();
+        int i = 0;
+        int j = 0;
+        while(i < 26) {
+            charMaterials[(char)(i + 65)] = materials[j++];
+            if(j == materials.Count) {
+                j = 0;
+            }
+            ++i;
+        }
     }
 
     public void StartGame(int mode)
     {
+        this.alphaHolder.SetActive(true);
         currentGameMode = (Mode)mode;
-        currentState = GameState.STARTED;
         Time.timeScale = 1f;
         SCALE = WIDTH / ROWS;
         switch (currentGameMode) {
             case Mode.LOCAL: 
                 //NetworkController.Instance.RequestConnection();
                 //Keep instantiating new aplhabets
-                InvokeRepeating("SpawnAlphabetLocal", 2.0f, SPAWN_RATE);
+                currentState = GameState.STARTED;
+                if(NetworkController.Instance.socketState()) {
+                    NetworkController.Instance.initializeSinglePlayerGame();
+                }
+                NetworkController.Instance.RequestConnection();
+                // InvokeRepeating("SpawnAlphabetLocal", 1.0f, SPAWN_RATE);
                 break;
             case Mode.MULTIPLAYER:
-                MenuController.Instance.DisableWaitingForPlayersMenu();
+                currentState = GameState.WAITING_FOR_PLAYERS;
+                if(NetworkController.Instance.socketState()) {
+                    chooseMultiplayerId("-1");
+                }
+                NetworkController.Instance.RequestConnection();
                 break;
         }
 
@@ -68,6 +92,30 @@ public class GameController : MonoBehaviour
         currentSelection = new List<Alphabet>();
     }
 
+    public void chooseMultiplayerId(string multiplayerId) {
+        if(currentGameMode == Mode.MULTIPLAYER && currentState == GameState.WAITING_FOR_PLAYERS) {
+            Debug.Log(multiplayerId);
+            Debug.Log(multiplayerId.Length);
+            if(multiplayerId != "-1") {
+                MenuController.Instance.DisableWaitingForPlayersMenu();
+                NetworkController.Instance.establishMultiplayerConnection(multiplayerId);
+            } else {
+                NetworkController.Instance.addToPool();
+            }
+        } else if(currentGameMode == Mode.LOCAL) {
+            NetworkController.Instance.initializeSinglePlayerGame();
+        }
+    }
+
+    public void setMultiplayerId(string multiplayerId) {
+        currentState = GameState.STARTED;
+    }
+
+    public void playerReady() {
+        currentState = GameState.STARTED;
+        MenuController.Instance.DisableWaitingForPlayersMenu();
+    }
+
     public void SetState(GameState nextState)
     {
         Instance.currentState = nextState;
@@ -75,54 +123,57 @@ public class GameController : MonoBehaviour
 
     public void EndGame()
     {
-        Debug.Log("********EndGame********");
+        alphabets.Clear();
         Time.timeScale = 0f;
+        currentSelection.Clear();
         MenuController.Instance.EndGame(SCORE);
+        // this.alphaHolder.SetActive(false);
     }
 
-    public void LoadMenu()
-    {
-        SceneManager.LoadScene("LobbyScene");
-    }
-
-    void SpawnAlphabetLocal()
-    {
-        int x = (int) (Random.Range(0, ROWS) * SCALE);
-        Vector3 position = new Vector3(x , 5, 0);
-        char character = (char)(Random.Range(0, 26) + 65);
-        bool isSpecial = Random.Range(0, 10) == 1;
-        CreateAlphabet(position, character, Random.Range(0,100), isSpecial);
-    }
-
-    public void CreateAlphabet(Vector3 position, char character, int id, bool isSpecial) {
+    public void CreateAlphabet(Vector3 position, char character, int id, int type) {
+        Alphabet.TYPE alphabetType = (Alphabet.TYPE)type;
         GameObject alphabet = Instantiate(alphabetPrefab, position, Quaternion.identity);
         alphabet.name = character + "_" + id.ToString();
         alphabet.transform.localScale = Vector3.one * SCALE;
         alphabet.GetComponent<Alphabet>().id = id;
         alphabet.GetComponent<Alphabet>().character = character;
+        alphabet.GetComponent<Alphabet>().setMaterial(charMaterials[character]);
+        alphabet.GetComponent<Alphabet>().alphabetType = alphabetType;
         alphabets[id] = alphabet;
-        if(isSpecial) {
-            alphabet.GetComponent<Alphabet>().makeSpecial(specialMaterial);
+        if(!(alphabetType == Alphabet.TYPE.NORMAL)) {
+            alphabet.GetComponent<Alphabet>().makeSpecial(alphabetType);
         }
     }
 
     public void UpdateScore(string word, List<int> idList, bool isDrag)
     {
-        if (currentGameMode == Mode.LOCAL) {
-            NetworkController.Instance.submitSelection(word, getLetterList(idList), isDrag);
-        }
-        else NetworkController.Instance.OnWordSelected(word, idList);
+        NetworkController.Instance.submitSelection(word, getLetterList(idList), isDrag, getExplosionCount(idList));
+        // else NetworkController.Instance.OnWordSelected(word, idList);
     }
 
-    private List<Tuple<int, bool>> getLetterList(List<int> idList) {
-        var list = new List<Tuple<int, bool>>();
+    private int getExplosionCount(List<int> idList)
+    {
+        int explosionCount = 0;
         foreach(int id in idList) {
-            list.Add(Tuple.Create(id, alphabets[id].GetComponent<Alphabet>().isSpecial()));
+            var type = alphabets[id].GetComponent<Alphabet>().alphabetType;
+            if(type == Alphabet.TYPE.BOMBERMAN) {
+                explosionCount += alphabets[id].GetComponent<Alphabet>().FindNeighbours().Count;
+            }
+        }
+        return explosionCount;
+    }
+
+    private List<Tuple<int, int>> getLetterList(List<int> idList) {
+        var list = new List<Tuple<int, int>>();
+        foreach(int id in idList) {
+            list.Add(Tuple.Create(id, (int)alphabets[id].GetComponent<Alphabet>().alphabetType));
         }
         return list;
     }
 
     public void UpdateScore(int scoreDelta) {
+        Debug.Log("in delta update score");
+        Debug.Log(scoreDelta);
         if (scoreDelta > 0)
         {
             SCORE += scoreDelta;
@@ -131,19 +182,37 @@ public class GameController : MonoBehaviour
         else MenuController.Instance.UnSelectAll();
     }
 
+    public void UpdateOpponentScore(int scoreDelta) {
+        if(scoreDelta > 0) {
+            OSCORE += scoreDelta;
+        }
+    }
+
     public void DestroyAlphabet(List<int> list) {
         foreach(int id in list) {
             alphabets[id].GetComponent<Alphabet>().Explode();
         }
     }
 
+    public void checkAndDestroyAlphabet(List<int> list) {
+   
+        bool flag = false;
+        List<int> idlist = new List<int>();
+        currentSelection.ForEach(alphabet => idlist.Add(alphabet.id));
+        foreach(int id in list) {
+            //something destroyed from current selection, unselect it
+            if(idlist.Contains(id)) {
+                flag = true;
+            }
+            alphabets[id].GetComponent<Alphabet>().Explode();
+        }
+        if(flag) {
+            MenuController.Instance.UnSelectAll();
+        }
+    }
+
     public void resetSelection() {
         MenuController.Instance.UnSelectAll();
-    }
-    
-    public void Quit()
-    {
-        Application.Quit();
     }
 
     public GameState GetState()
